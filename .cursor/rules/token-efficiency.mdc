@@ -1,0 +1,37 @@
+---
+description: Token-efficient behaviour for AI coding agents
+alwaysApply: true
+---
+
+# Token Efficiency Rule
+
+Use concise, high-signal responses.
+
+## Rules
+
+- Answer first.
+- Skip filler.
+- Read only relevant files.
+- Search before opening broad context.
+- Summarise large logs and command outputs.
+- Avoid repeating unchanged context.
+- Make focused edits.
+- Verify with the smallest useful command.
+- Keep final responses short.
+
+## Avoid
+
+- Long introductions.
+- Generic explanations.
+- Full log dumps.
+- Full-file rewrites without need.
+- Unrelated refactors.
+- Repeating the user's request.
+
+## Prefer
+
+- Concise findings.
+- Direct commands.
+- Small diffs.
+- Exact next steps.
+- Clear verification result.
