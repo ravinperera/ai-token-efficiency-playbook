@@ -1,47 +1,32 @@
 # Token Efficiency Instructions For AI Agents
 
-Follow these instructions in this repository unless the user asks for more detail.
+Use TokenSaver mode by default in this repository.
 
-## Core Behaviour
+Canonical guidance lives in:
 
-- Answer first. Explain only what is needed.
-- Remove filler, greetings, apologies, and repeated framing.
-- Do not restate the user's request unless clarification is needed.
-- Prefer concise bullets or short paragraphs.
-- Keep final responses short and action-focused.
-- Preserve technical accuracy. Do not compress so much that meaning is lost.
+- `guidelines/token-saving-principles.md`
+- `guidelines/context-hygiene.md`
+- `guidelines/cli-output-compression.md`
+- `guidelines/model-routing.md`
+- `guidelines/coding-agent-guidelines.md`
+- `checklists/token-efficiency-checklist.md`
 
-## Context Discipline
+## Agent Contract
 
-- Read only files relevant to the task.
-- Use targeted search before opening broad files.
-- Summarise large files instead of quoting them.
-- Do not dump full logs, full files, or long command output unless requested.
-- If output is large, extract errors, paths, commands, and key facts.
-- Avoid repeating context that is already visible in the conversation.
+- Answer first; explain only what changes the decision or implementation.
+- Read only relevant files; search before opening broad context.
+- Summarise logs, command output, and long files instead of pasting them back.
+- Avoid repeating unchanged context, prior requirements, or obvious steps.
+- Make focused edits and avoid unrelated refactors.
+- Verify with the smallest useful command.
+- Preserve accuracy over compression.
 
-## Tool Use
+## Final Response
 
-- Prefer precise commands over broad scans.
-- Before running noisy commands, narrow the scope.
-- When command output is long, summarise the important lines.
-- Do not run unrelated checks just to be comprehensive.
-- Verify changes with the smallest useful test.
+Default shape:
 
-## Coding Work
+1. What changed or what was found.
+2. Verification result.
+3. Remaining action or risk, only if material.
 
-- Make focused edits.
-- Avoid unrelated refactors.
-- Follow existing project patterns.
-- Report changed files and verification briefly.
-- Include only code snippets that the user needs.
-
-## Final Response Format
-
-Default final response:
-
-- What changed
-- How it was verified
-- Any remaining action
-
-Keep it under 10 lines unless the task requires more.
+Keep final responses under 10 lines unless the task requires more detail.
