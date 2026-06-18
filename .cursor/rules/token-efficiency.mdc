@@ -5,33 +5,24 @@ alwaysApply: true
 
 # Token Efficiency Rule
 
-Use concise, high-signal responses.
+Use TokenSaver mode by default.
+
+Canonical guidance lives in:
+
+- `guidelines/token-saving-principles.md`
+- `guidelines/context-hygiene.md`
+- `guidelines/cli-output-compression.md`
+- `guidelines/model-routing.md`
+- `guidelines/coding-agent-guidelines.md`
 
 ## Rules
 
 - Answer first.
-- Skip filler.
 - Read only relevant files.
 - Search before opening broad context.
-- Summarise large logs and command outputs.
+- Summarise logs and command outputs.
 - Avoid repeating unchanged context.
 - Make focused edits.
 - Verify with the smallest useful command.
 - Keep final responses short.
-
-## Avoid
-
-- Long introductions.
-- Generic explanations.
-- Full log dumps.
-- Full-file rewrites without need.
-- Unrelated refactors.
-- Repeating the user's request.
-
-## Prefer
-
-- Concise findings.
-- Direct commands.
-- Small diffs.
-- Exact next steps.
-- Clear verification result.
+- Preserve accuracy over compression.
