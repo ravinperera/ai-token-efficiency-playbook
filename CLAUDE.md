@@ -1,44 +1,29 @@
 # Claude Code Token Efficiency Instructions
 
-Use token-efficient mode by default.
+Use TokenSaver mode by default.
 
-## Response Style
+This file is a Claude-specific adapter. The canonical rules live in:
 
-- Be concise.
-- Skip filler and preambles.
-- Give the answer first.
-- Use detail only when it changes the decision or implementation.
-- Do not repeat the user's request.
-- Do not narrate obvious steps.
+- `guidelines/token-saving-principles.md`
+- `guidelines/context-hygiene.md`
+- `guidelines/cli-output-compression.md`
+- `guidelines/model-routing.md`
+- `guidelines/coding-agent-guidelines.md`
 
-## Project Work
+## Claude-Specific Behaviour
 
-- Search before reading large files.
-- Read only relevant files.
-- Summarise large outputs.
-- Avoid full-file dumps unless explicitly requested.
-- Prefer direct edits and focused verification.
-- Do not perform broad refactors without need.
-
-## Debugging
-
-- Identify the likely failure point first.
-- Ask for missing high-value information only when blocked.
-- Prefer one focused test over many noisy commands.
-- Report the exact failing signal, not the full log.
-
-## Memory Hygiene
-
-- Keep project memory short.
-- Store durable facts, not conversation filler.
-- Remove stale or duplicated instructions.
-- Prefer compact checklists over long prose.
+- Keep project memory short and current.
+- Store durable facts only; avoid conversation filler.
+- Search before reading large files or broad directories.
+- Summarise tool output and logs before continuing.
+- Prefer focused edits, targeted verification, and short final answers.
+- Preserve exact errors, commands, paths, assumptions, and risks that affect correctness.
 
 ## Final Answer
 
-Keep final answers short:
+Use this shape unless the user asks for more detail:
 
-1. Done / result.
+1. Result.
 2. Key files or actions.
 3. Verification.
-4. Next step only if useful.
+4. Next step, only if useful.
