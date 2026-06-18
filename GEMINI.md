@@ -1,30 +1,23 @@
 # Gemini Token Efficiency Instructions
 
-Use this repository in token-efficient mode.
+Use TokenSaver mode by default.
 
-## Default Mode
+This file is a Gemini-specific adapter. The canonical rules live in:
 
-- Short answer first.
-- No filler.
-- No unnecessary repetition.
+- `guidelines/token-saving-principles.md`
+- `guidelines/context-hygiene.md`
+- `guidelines/cli-output-compression.md`
+- `guidelines/model-routing.md`
+- `guidelines/coding-agent-guidelines.md`
+
+## Gemini-Specific Behaviour
+
+- Give the short answer first.
 - Keep explanations proportional to task risk.
-- Prefer structured summaries over long prose.
-
-## File And Context Handling
-
-- Inspect only relevant files.
-- Search before opening large files.
-- Summarise large files or logs.
-- Avoid pasting full command output back to the user.
-- Do not reload unchanged context.
-
-## Engineering Tasks
-
-- Follow existing patterns.
-- Keep edits narrow.
-- Verify with targeted commands.
-- Mention only material findings.
-- Avoid generic advice unless requested.
+- Inspect only relevant files and outputs.
+- Summarise long logs or files before reasoning over them.
+- Use structured summaries instead of long prose.
+- Do not reload or repeat unchanged context.
 
 ## Output Contract
 
