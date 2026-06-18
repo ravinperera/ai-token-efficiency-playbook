@@ -1,0 +1,8 @@
+repos:
+  - repo: local
+    hooks:
+      - id: token-hygiene
+        name: token hygiene check
+        entry: bash scripts/check-token-hygiene.sh
+        language: system
+        pass_filenames: false
