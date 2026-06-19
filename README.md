@@ -10,7 +10,19 @@ Most token waste comes from oversized context, repeated memory, noisy logs, and 
 
 ## 30-Second Install
 
-Pick your tool, copy the matching file into your repository, and commit it.
+Install the right instruction file into the current repository:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/ravinperera/ai-token-efficiency-playbook/main/scripts/install-token-efficiency.sh | sh -s -- codex
+```
+
+Replace `codex` with `claude`, `gemini`, `copilot`, or `cursor`. Existing files are not overwritten unless you pass `--force`:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/ravinperera/ai-token-efficiency-playbook/main/scripts/install-token-efficiency.sh | sh -s -- cursor --force
+```
+
+Manual copy is also supported:
 
 | Tool | Copy this file |
 | --- | --- |
@@ -56,7 +68,8 @@ Ready-to-copy instruction files and supporting material:
 │   ├── bad-vs-good-context.md
 │   └── case-study-ci-log-triage.md
 ├── scripts/
-│   └── check-token-hygiene.sh
+│   ├── check-token-hygiene.sh
+│   └── install-token-efficiency.sh
 └── checklists/
     └── token-efficiency-checklist.md
 ```
