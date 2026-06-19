@@ -1,0 +1,36 @@
+name: New tool instruction file
+description: Request support for another AI tool or agent instruction format
+title: "Add instruction file for <tool>"
+labels:
+  - enhancement
+  - tool-support
+body:
+  - type: input
+    id: tool
+    attributes:
+      label: Tool name
+      description: Name of the AI tool, agent, IDE, or CLI.
+      placeholder: Example: Windsurf
+    validations:
+      required: true
+  - type: input
+    id: target-path
+    attributes:
+      label: Expected instruction path
+      description: Where should the instruction file live in a consuming repo?
+      placeholder: Example: .windsurf/rules/token-efficiency.md
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Tool-specific token waste notes
+      description: What does this tool commonly over-load or repeat?
+      placeholder: Example: It loads broad workspace context unless rules are scoped.
+    validations:
+      required: true
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: Link official docs or examples if available.
