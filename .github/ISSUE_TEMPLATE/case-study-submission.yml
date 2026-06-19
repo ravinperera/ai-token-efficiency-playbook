@@ -1,0 +1,44 @@
+name: Case study submission
+description: Submit a measured before/after token-efficiency case study
+title: "Case study: <workflow>"
+labels:
+  - case-study
+body:
+  - type: input
+    id: workflow
+    attributes:
+      label: Workflow
+      description: What task or workflow did you measure?
+      placeholder: Example: Terraform plan debugging
+    validations:
+      required: true
+  - type: textarea
+    id: before
+    attributes:
+      label: Before context
+      description: Summarise the original prompt/context shape and token count.
+    validations:
+      required: true
+  - type: textarea
+    id: after
+    attributes:
+      label: After context
+      description: Summarise the TokenSaver prompt/context shape and token count.
+    validations:
+      required: true
+  - type: textarea
+    id: method
+    attributes:
+      label: Measurement method
+      description: Include tokenizer/tool, model, command, and caveats.
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Submission checks
+      options:
+        - label: I avoided fixed-percentage claims.
+          required: true
+        - label: I kept enough context to preserve correctness.
+          required: true
