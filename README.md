@@ -1,5 +1,7 @@
 # AI Token Efficiency Playbook
 
+[![Token hygiene](https://github.com/ravinperera/ai-token-efficiency-playbook/actions/workflows/token-hygiene.yml/badge.svg)](https://github.com/ravinperera/ai-token-efficiency-playbook/actions/workflows/token-hygiene.yml)
+
 Drop-in instructions, prompts, examples, and lightweight checks to reduce wasted AI tokens across Codex, Claude Code, GitHub Copilot, Cursor, Gemini, and other AI coding agents.
 
 This project is not just about making AI replies shorter. The main thesis is:
