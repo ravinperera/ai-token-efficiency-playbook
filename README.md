@@ -57,6 +57,8 @@ Ready-to-copy instruction files and supporting material:
 │   └── case-study-ci-log-triage.md
 ├── scripts/
 │   └── check-token-hygiene.sh
+├── templates/
+│   └── token-savings-measurement.md
 └── checklists/
     └── token-efficiency-checklist.md
 ```
@@ -117,7 +119,7 @@ No. The goal is to remove low-value context, not useful evidence. Accuracy comes
 
 ### How do I measure savings?
 
-Use your AI tool's token dashboard where available, or run the same workflow before and after applying the playbook and compare prompt/context size. Record the tool, model, input shape, output shape, and caveats so the result is reproducible.
+Use your AI tool's token dashboard where available, or run the same workflow before and after applying the playbook and compare prompt/context size. Record the tool, model, input shape, output shape, and caveats so the result is reproducible. Use `templates/token-savings-measurement.md` as a starting point.
 
 ### Is this only for coding agents?
 
