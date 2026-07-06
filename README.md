@@ -58,6 +58,7 @@ Ready-to-copy instruction files and supporting material:
 ├── scripts/
 │   └── check-token-hygiene.sh
 ├── templates/
+│   ├── ci-failure-triage.md
 │   └── token-savings-measurement.md
 └── checklists/
     └── token-efficiency-checklist.md
@@ -95,6 +96,8 @@ Short replies help, but context hygiene usually saves more.
 Use TokenSaver mode for this task.
 Answer first. Read only relevant files. Summarise large outputs. Do not repeat unchanged context. Use the smallest useful verification. Keep final response short unless I ask for detail.
 ```
+
+For CI/CD failures, use [`templates/ci-failure-triage.md`](templates/ci-failure-triage.md) to provide the exact failure signal without pasting full raw logs.
 
 ## Optional Local Check
 
