@@ -104,6 +104,8 @@ Run the lightweight hygiene check before committing AI instruction files or logs
 bash scripts/check-token-hygiene.sh
 ```
 
+The same check can also run in CI. See [`docs/token-hygiene-ci.md`](docs/token-hygiene-ci.md) for the workflow purpose, default thresholds, and tuning guidance.
+
 With pre-commit:
 
 ```bash
