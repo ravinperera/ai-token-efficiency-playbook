@@ -1,0 +1,22 @@
+name: Token hygiene
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  token-hygiene:
+    name: Run token hygiene checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Run token hygiene script
+        run: bash scripts/check-token-hygiene.sh
