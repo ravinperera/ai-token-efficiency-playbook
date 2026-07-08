@@ -59,6 +59,7 @@ Ready-to-copy instruction files and supporting material:
 │   └── check-token-hygiene.sh
 ├── templates/
 │   ├── ci-failure-triage.md
+│   ├── handoff-template.md
 │   └── token-savings-measurement.md
 └── checklists/
     └── token-efficiency-checklist.md
@@ -98,6 +99,8 @@ Answer first. Read only relevant files. Summarise large outputs. Do not repeat u
 ```
 
 For CI/CD failures, use [`templates/ci-failure-triage.md`](templates/ci-failure-triage.md) to provide the exact failure signal without pasting full raw logs.
+
+For concise task transfers, use [`templates/handoff-template.md`](templates/handoff-template.md) to capture facts, errors, recent changes, tried commands, and open questions without carrying unnecessary context.
 
 ## Optional Local Check
 
