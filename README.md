@@ -50,7 +50,8 @@ Ready-to-copy instruction files and supporting material:
 │   ├── coding-agent-guidelines.md
 │   ├── context-hygiene.md
 │   ├── cli-output-compression.md
-│   └── model-routing.md
+│   ├── model-routing.md
+│   └── anti-patterns.md
 ├── examples/
 │   ├── before-after-prompts.md
 │   ├── bad-vs-good-context.md
@@ -79,6 +80,8 @@ AI agents should:
 - Keep persistent instruction and memory files short.
 - Use cheaper or faster models for simple tasks where appropriate.
 - Preserve technical accuracy over extreme compression.
+
+For common mistakes and fixes, see the [token waste anti-patterns catalogue](guidelines/anti-patterns.md).
 
 ## Why This Matters
 
