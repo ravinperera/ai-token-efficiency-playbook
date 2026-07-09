@@ -67,6 +67,8 @@ Ready-to-copy instruction files and supporting material:
     └── token-efficiency-checklist.md
 ```
 
+See [`CHANGELOG.md`](CHANGELOG.md) for the lightweight version history and release notes.
+
 ## The Standard
 
 The canonical rules live in `guidelines/`. Tool-specific files such as `AGENTS.md`, `CLAUDE.md`, and `GEMINI.md` are intentionally thin adapters.
