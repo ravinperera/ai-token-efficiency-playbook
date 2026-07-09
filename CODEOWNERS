@@ -1,0 +1,6 @@
+# Default owner for repository changes
+* @ravinperera
+
+# Keep GitHub community health and workflow files reviewed
+.github/ @ravinperera
+.github/workflows/ @ravinperera
