@@ -58,7 +58,8 @@ Ready-to-copy instruction files and supporting material:
 │   ├── bad-vs-good-context.md
 │   └── case-study-ci-log-triage.md
 ├── scripts/
-│   └── check-token-hygiene.sh
+│   ├── check-token-hygiene.sh
+│   └── estimate-context-size.py
 ├── templates/
 │   ├── ci-failure-triage.md
 │   ├── handoff-template.md
@@ -119,6 +120,12 @@ bash scripts/check-token-hygiene.sh
 ```
 
 The same check can also run in CI. See [`docs/token-hygiene-ci.md`](docs/token-hygiene-ci.md) for the workflow purpose, default thresholds, and tuning guidance.
+
+To produce rough before/after context-size numbers for a case study, use the dependency-free estimator documented in [`docs/context-size-estimator.md`](docs/context-size-estimator.md):
+
+```bash
+python3 scripts/estimate-context-size.py before.md after.md --markdown
+```
 
 With pre-commit:
 
