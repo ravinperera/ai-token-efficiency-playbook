@@ -1,0 +1,41 @@
+name: Helper script tests
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: helper-script-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Test dependency-free helpers
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Fetch the exact repository revision
+        shell: bash
+        env:
+          REPOSITORY: ${{ github.repository }}
+          REF: ${{ github.ref }}
+          SERVER_URL: ${{ github.server_url }}
+        run: |
+          set -euo pipefail
+          git init --initial-branch=worktree .
+          git remote add origin "${SERVER_URL}/${REPOSITORY}.git"
+          git fetch --no-tags --depth=1 origin "${REF}"
+          git checkout --detach FETCH_HEAD
+
+      - name: Test context-size estimator
+        run: |
+          python3 -m unittest discover \
+            -s tests \
+            -p 'test_estimate_context_size.py' \
+            -v
