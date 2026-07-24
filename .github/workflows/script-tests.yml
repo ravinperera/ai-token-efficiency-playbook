@@ -39,3 +39,6 @@ jobs:
             -s tests \
             -p 'test_estimate_context_size.py' \
             -v
+
+      - name: Test token hygiene checker
+        run: bash tests/test_check_token_hygiene.sh

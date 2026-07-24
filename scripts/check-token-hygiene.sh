@@ -56,17 +56,15 @@ check_instruction_file ".github/copilot-instructions.md"
 check_instruction_file ".cursor/rules/token-efficiency.mdc"
 
 if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-  files=$(git diff --cached --name-only --diff-filter=ACM || true)
+  while IFS= read -r -d '' file; do
+    check_large_file "$file"
+  done < <(git diff --cached --name-only --diff-filter=ACM -z)
 else
-  files=$(find . -type f | sed 's#^./##')
+  while IFS= read -r -d '' file; do
+    file="${file#./}"
+    check_large_file "$file"
+  done < <(find . -type f -not -path './.git/*' -print0)
 fi
-
-for file in $files; do
-  case "$file" in
-    .git/*) continue ;;
-  esac
-  check_large_file "$file"
-done
 
 if [ "$failures" -gt 0 ]; then
   echo "token hygiene check failed with $failures issue(s)."
