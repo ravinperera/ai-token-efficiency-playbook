@@ -13,10 +13,14 @@ jobs:
   token-hygiene:
     name: Run token hygiene checks
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+
+      - name: Run context estimator regression tests
+        run: python3 -m unittest discover -s tests -p 'test_*.py' -v
 
       - name: Run token hygiene script
         run: bash scripts/check-token-hygiene.sh
