@@ -62,6 +62,8 @@ Ready-to-copy instruction files and supporting material:
 ├── scripts/
 │   ├── check-token-hygiene.sh
 │   └── estimate-context-size.py
+├── tests/
+│   └── test_estimate_context_size.py
 ├── templates/
 │   ├── ci-failure-triage.md
 │   ├── handoff-template.md
@@ -135,6 +137,14 @@ To produce rough before/after context-size numbers for a case study, use the dep
 ```bash
 python3 scripts/estimate-context-size.py before.md after.md --markdown
 ```
+
+Run the estimator regression tests before changing its file discovery, encoding, totals, or output format:
+
+```bash
+python3 -m unittest discover -s tests -p 'test_estimate_context_size.py' -v
+```
+
+GitHub Actions runs the same dependency-free test suite on pull requests and pushes to `main`.
 
 With pre-commit:
 
