@@ -57,12 +57,15 @@ Ready-to-copy instruction files and supporting material:
 │   ├── before-after-prompts.md
 │   ├── bad-vs-good-context.md
 │   └── case-study-ci-log-triage.md
+├── benchmarks/
+│   └── dynamic-resource-discovery.md
 ├── scripts/
 │   ├── check-token-hygiene.sh
 │   └── estimate-context-size.py
 ├── templates/
 │   ├── ci-failure-triage.md
 │   ├── handoff-template.md
+│   ├── resource-discovery-measurement.csv
 │   └── token-savings-measurement.md
 └── checklists/
     └── token-efficiency-checklist.md
@@ -99,6 +102,12 @@ Token waste normally comes from four places:
 4. Poor model routing: using high-cost reasoning models for simple formatting, summarisation, or extraction.
 
 Short replies help, but context hygiene usually saves more.
+
+## Emerging benchmark: dynamic resource discovery
+
+Agent clients are beginning to discover skills, tools, agents, and MCP servers on demand instead of preloading every capability into each session. The [dynamic resource discovery benchmark](benchmarks/dynamic-resource-discovery.md) defines a vendor-neutral method for comparing those approaches across input context, total tokens, cost, latency, task success, resource selection, and safety.
+
+Use [`templates/resource-discovery-measurement.csv`](templates/resource-discovery-measurement.csv) to capture raw runs. This repository does **not** claim a saving until comparable, reproducible measurements have been collected.
 
 ## Example Token-Saver Prompt
 
