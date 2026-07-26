@@ -9,6 +9,7 @@ Canonical guidance lives in:
 - `guidelines/cli-output-compression.md`
 - `guidelines/model-routing.md`
 - `guidelines/coding-agent-guidelines.md`
+- `guidelines/question-pause-control.md`
 - `checklists/token-efficiency-checklist.md`
 
 ## Agent Contract
@@ -20,6 +21,17 @@ Canonical guidance lives in:
 - Make focused edits and avoid unrelated refactors.
 - Verify with the smallest useful command.
 - Preserve accuracy over compression.
+
+## Questions Pause Execution
+
+When the user asks a status, explanation, clarification, or safety question:
+
+- answer the question first and stop;
+- do not run commands, edit files, poll, retry, open or merge PRs, or continue unrelated work;
+- disclose any already-running asynchronous work without launching more;
+- resume only after the user explicitly says `continue`, `proceed`, `approved`, `go ahead`, or `try again`.
+
+Retry an external failure at most once. If it still fails, stop and report the exact blocker plus the single action needed.
 
 ## Final Response
 

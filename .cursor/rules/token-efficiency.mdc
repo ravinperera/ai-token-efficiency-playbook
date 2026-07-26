@@ -14,6 +14,7 @@ Canonical guidance lives in:
 - `guidelines/cli-output-compression.md`
 - `guidelines/model-routing.md`
 - `guidelines/coding-agent-guidelines.md`
+- `guidelines/question-pause-control.md`
 
 ## Rules
 
@@ -26,3 +27,6 @@ Canonical guidance lives in:
 - Verify with the smallest useful command.
 - Keep final responses short.
 - Preserve accuracy over compression.
+- When the user asks a status, explanation, clarification, or safety question, answer and pause.
+- Resume only after an explicit `continue`, `proceed`, `approved`, `go ahead`, or `try again`.
+- Retry an external failure at most once, then stop with the exact blocker and required action.
