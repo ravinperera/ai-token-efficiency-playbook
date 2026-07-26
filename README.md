@@ -50,14 +50,17 @@ Ready-to-copy instruction files and supporting material:
 │   ├── coding-agent-guidelines.md
 │   ├── context-hygiene.md
 │   ├── cli-output-compression.md
+│   ├── document-to-markdown.md
 │   ├── model-routing.md
 │   ├── per-tool-notes.md
 │   └── anti-patterns.md
 ├── examples/
 │   ├── before-after-prompts.md
 │   ├── bad-vs-good-context.md
-│   └── case-study-ci-log-triage.md
+│   ├── case-study-ci-log-triage.md
+│   └── image-vs-markdown-context.md
 ├── benchmarks/
+│   ├── document-conversion-measurement.md
 │   └── dynamic-resource-discovery.md
 ├── scripts/
 │   ├── check-token-hygiene.sh
@@ -67,6 +70,7 @@ Ready-to-copy instruction files and supporting material:
 │   └── test_estimate_context_size.py
 ├── templates/
 │   ├── ci-failure-triage.md
+│   ├── document-context-extraction.md
 │   ├── handoff-template.md
 │   ├── resource-discovery-measurement.csv
 │   └── token-savings-measurement.md
@@ -85,6 +89,8 @@ AI agents should:
 - Use context hygiene before optimizing response style.
 - Search before reading large files.
 - Read the smallest relevant file range.
+- Convert text-heavy documents to searchable Markdown before loading whole documents or screenshot collections.
+- Keep the original visual only when layout, charts, diagrams, or image content affect the answer.
 - Summarise large logs instead of repeating them.
 - Avoid restating unchanged context.
 - Keep persistent instruction and memory files short.
@@ -95,16 +101,39 @@ For tool-specific context risks, see the [per-tool token waste notes](guidelines
 
 For common mistakes and fixes, see the [token waste anti-patterns catalogue](guidelines/anti-patterns.md).
 
+For PDFs, Office files, spreadsheets, screenshots, and scans, see the [document-to-Markdown context reduction guide](guidelines/document-to-markdown.md).
+
 ## Why This Matters
 
 Token waste normally comes from four places:
 
-1. Oversized input context: whole repos, full files, screenshots, and long chat history.
+1. Oversized input context: whole repos, full files, complete documents, screenshots, and long chat history.
 2. Noisy tool output: full CI logs, Terraform plans, stack traces, and terminal dumps.
 3. Repeated instructions: duplicated memory files, repeated project rules, and stale context.
 4. Poor model routing: using high-cost reasoning models for simple formatting, summarisation, or extraction.
 
 Short replies help, but context hygiene usually saves more.
+
+## Document-to-Markdown workflow
+
+Text-heavy PDFs, Word documents, PowerPoint files, spreadsheets, screenshots, and scans can often be converted to searchable Markdown before AI use. Microsoft [MarkItDown](https://github.com/microsoft/markitdown) is one example of a local conversion utility designed for LLM and text-analysis workflows.
+
+The recommended process is:
+
+```text
+convert locally -> inspect -> search -> select relevant sections -> attach a visual only when needed
+```
+
+This avoids providing an entire document when the task needs only a few sections. The original page or image should still be retained when the answer depends on diagrams, charts, colour, spatial layout, UI appearance, handwriting, or complex tables.
+
+Start with:
+
+- [Document-to-Markdown guidance](guidelines/document-to-markdown.md)
+- [Image-heavy vs selected-Markdown example](examples/image-vs-markdown-context.md)
+- [Document context extraction template](templates/document-context-extraction.md)
+- [Document conversion measurement protocol](benchmarks/document-conversion-measurement.md)
+
+The playbook makes no fixed token-saving claim for conversion. Measure the complete document, complete Markdown, selected Markdown, and selected-Markdown-plus-visual approaches against the same task.
 
 ## Emerging benchmark: dynamic resource discovery
 
@@ -167,11 +196,11 @@ Use your AI tool's token dashboard where available, or run the same workflow bef
 
 ### Is this only for coding agents?
 
-No. It works for AI chat, code review, incident triage, CI debugging, infrastructure-as-code, documentation cleanup, and long-running engineering tasks.
+No. It works for AI chat, code review, incident triage, CI debugging, infrastructure-as-code, document review, documentation cleanup, and long-running engineering tasks.
 
 ## What This Is Not
 
-This is not a benchmark claim that every workflow saves a fixed percentage. Token savings depend on the task, model, tool, and how much context is loaded. The aim is practical reduction without making the AI less useful.
+This is not a benchmark claim that every workflow saves a fixed percentage. Token savings depend on the task, model, tool, document format, conversion quality, and how much context is loaded. The aim is practical reduction without making the AI less useful.
 
 ## Recommended Use
 
@@ -180,6 +209,7 @@ Use this playbook when working with:
 - AI coding agents
 - terminal-based AI tools
 - large codebases
+- text-heavy documents and screenshot collections
 - CI/CD logs
 - infrastructure-as-code projects
 - long debugging sessions
