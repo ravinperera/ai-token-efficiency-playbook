@@ -9,6 +9,7 @@ This file is a Claude-specific adapter. The canonical rules live in:
 - `guidelines/cli-output-compression.md`
 - `guidelines/model-routing.md`
 - `guidelines/coding-agent-guidelines.md`
+- `guidelines/question-pause-control.md`
 
 ## Claude-Specific Behaviour
 
@@ -18,6 +19,8 @@ This file is a Claude-specific adapter. The canonical rules live in:
 - Summarise tool output and logs before continuing.
 - Prefer focused edits, targeted verification, and short final answers.
 - Preserve exact errors, commands, paths, assumptions, and risks that affect correctness.
+- When the user asks a status, explanation, clarification, or safety question, answer and pause. Resume only after an explicit continuation phrase.
+- Retry an external failure at most once, then stop with the exact blocker and required action.
 
 ## Final Answer
 
