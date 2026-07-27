@@ -72,6 +72,7 @@ Ready-to-copy instruction files and supporting material:
 │   ├── ci-failure-triage.md
 │   ├── document-context-extraction.md
 │   ├── handoff-template.md
+│   ├── model-routing-decision.md
 │   ├── resource-discovery-measurement.csv
 │   └── token-savings-measurement.md
 └── checklists/
@@ -94,7 +95,8 @@ AI agents should:
 - Summarise large logs instead of repeating them.
 - Avoid restating unchanged context.
 - Keep persistent instruction and memory files short.
-- Use cheaper or faster models for simple tasks where appropriate.
+- Use the lowest approved model tier capable of the task.
+- Escalate early when security, production, architecture, ambiguity, sensitive data, or repeated failure appears.
 - Preserve technical accuracy over extreme compression.
 
 For tool-specific context risks, see the [per-tool token waste notes](guidelines/per-tool-notes.md).
@@ -102,6 +104,8 @@ For tool-specific context risks, see the [per-tool token waste notes](guidelines
 For common mistakes and fixes, see the [token waste anti-patterns catalogue](guidelines/anti-patterns.md).
 
 For PDFs, Office files, spreadsheets, screenshots, and scans, see the [document-to-Markdown context reduction guide](guidelines/document-to-markdown.md).
+
+For lower-model selection and escalation rules, see the [practical model-routing guide](guidelines/model-routing.md) and the [routing decision template](templates/model-routing-decision.md).
 
 ## Why This Matters
 
@@ -113,6 +117,29 @@ Token waste normally comes from four places:
 4. Poor model routing: using high-cost reasoning models for simple formatting, summarisation, or extraction.
 
 Short replies help, but context hygiene usually saves more.
+
+## Practical model routing
+
+Use capability tiers instead of hard-coding model names:
+
+| Tier | Example use |
+| --- | --- |
+| Economy / fast | Formatting, extraction, rewriting, selected-text summarisation, deterministic transformations |
+| Balanced | Scoped bug fixes, focused code review, ordinary engineering tasks with clear acceptance criteria |
+| Advanced reasoning | Security, production, architecture, incidents, ambiguous requirements, broad cross-system work |
+
+Recommended routing flow:
+
+```text
+confirm approved data boundary -> classify risk -> choose lowest capable tier -> verify -> escalate when triggered
+```
+
+Do not silently switch provider, tenancy, region, retention policy, approved model family, or data boundary merely to reduce cost. If the agent host cannot change models automatically, it should state the recommended tier rather than pretending a switch happened.
+
+Start with:
+
+- [Practical model-routing guide](guidelines/model-routing.md)
+- [Model-routing decision template](templates/model-routing-decision.md)
 
 ## Document-to-Markdown workflow
 
