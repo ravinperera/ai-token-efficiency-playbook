@@ -107,6 +107,8 @@ For PDFs, Office files, spreadsheets, screenshots, and scans, see the [document-
 
 For lower-model selection and escalation rules, see the [practical model-routing guide](guidelines/model-routing.md) and the [routing decision template](templates/model-routing-decision.md).
 
+For long-running chats and assistants, see the [long-lived assistant guidance](guidelines/context-hygiene.md#long-lived-assistants).
+
 ## Why This Matters
 
 Token waste normally comes from four places:
@@ -117,6 +119,20 @@ Token waste normally comes from four places:
 4. Poor model routing: using high-cost reasoning models for simple formatting, summarisation, or extraction.
 
 Short replies help, but context hygiene usually saves more.
+
+## Long-lived assistant context
+
+Long-running assistants should keep three concerns separate:
+
+```text
+active working context != durable memory != searchable full history
+```
+
+The active context should contain only the recent conversation and evidence needed for the current task. Durable memory should contain stable facts, preferences, decisions, procedures, and corrections. Full history should remain searchable for exact lookup rather than being loaded into every request.
+
+When the runtime supports context-window telemetry, monitor usage deterministically and compact before the provider limit. A safe compaction keeps recent turns, creates a structured continuation summary, verifies that the summary was saved, and retains the full history separately.
+
+This is a small operating guideline, not a memory-runtime implementation. Semantic memory graphs, automated conflict and staleness management, background consolidation, and platform-specific integrations remain future work.
 
 ## Practical model routing
 
@@ -223,7 +239,7 @@ Use your AI tool's token dashboard where available, or run the same workflow bef
 
 ### Is this only for coding agents?
 
-No. It works for AI chat, code review, incident triage, CI debugging, infrastructure-as-code, document review, documentation cleanup, and long-running engineering tasks.
+No. It works for AI chat, code review, incident triage, CI debugging, infrastructure-as-code, document review, documentation cleanup, and long-running engineering tasks. Runtime-specific memory and session-management implementations remain outside the current scope.
 
 ## What This Is Not
 
@@ -240,6 +256,7 @@ Use this playbook when working with:
 - CI/CD logs
 - infrastructure-as-code projects
 - long debugging sessions
+- long-lived assistants that need basic context and memory boundaries
 - repeated review or refactor workflows
 
 ## Contributing
