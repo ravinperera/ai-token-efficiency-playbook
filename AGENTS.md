@@ -21,6 +21,11 @@ Canonical guidance lives in:
 - Make focused edits and avoid unrelated refactors.
 - Verify with the smallest useful command.
 - Preserve accuracy over compression.
+- Use the lowest approved model tier capable of the task when the host supports routing.
+- Prefer economy/fast models for bounded formatting, extraction, rewriting, and simple summarisation.
+- Escalate for security, production, architecture, ambiguity, broad multi-file work, sensitive data, or a materially failed first attempt.
+- If the host cannot switch models, state the recommended tier; never pretend a switch occurred.
+- Never silently switch provider, tenancy, region, retention policy, approved model family, or data boundary.
 
 ## Questions Pause Execution
 
