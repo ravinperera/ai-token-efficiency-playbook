@@ -1,0 +1,26 @@
+name: Markdown quality
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  markdown-quality:
+    name: Check Markdown and local links
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Run checker regression tests
+        run: python3 -m unittest discover -s tests -p 'test_markdown_quality.py' -v
+
+      - name: Check Markdown files
+        run: python3 scripts/check_markdown_quality.py
