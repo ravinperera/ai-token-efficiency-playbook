@@ -21,22 +21,28 @@ class EstimateContextSizeTests(unittest.TestCase):
         self.assertEqual(estimator.estimate_tokens("a"), 1)
         self.assertEqual(estimator.estimate_tokens("abcdefgh"), 2)
 
-    def test_iter_files_is_sorted_and_excludes_git_metadata(self) -> None:
+    def test_iter_files_is_recursive_sorted_and_excludes_git_metadata(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
+            (root / "nested").mkdir()
             (root / "b.txt").write_text("b", encoding="utf-8")
-            (root / "a.txt").write_text("a", encoding="utf-8")
+            (root / "nested" / "a.txt").write_text("a", encoding="utf-8")
             (root / ".git").mkdir()
             (root / ".git" / "config").write_text("secret", encoding="utf-8")
 
-            files = [path.name for path in estimator.iter_files([str(root)])]
-            self.assertEqual(files, ["a.txt", "b.txt"])
+            files = list(estimator.iter_files([str(root)]))
+            self.assertEqual(files, [root / "b.txt", root / "nested" / "a.txt"])
 
-    def test_read_text_replaces_invalid_utf8(self) -> None:
+    def test_read_text_preserves_unicode_and_replaces_invalid_utf8(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
-            path = Path(directory) / "input.bin"
-            path.write_bytes(b"good\xffbad")
-            self.assertEqual(estimator.read_text(path), "good\ufffdbad")
+            root = Path(directory)
+            unicode_path = root / "unicode.txt"
+            invalid_path = root / "input.bin"
+            unicode_path.write_text("café ☕", encoding="utf-8")
+            invalid_path.write_bytes(b"good\xffbad")
+
+            self.assertEqual(estimator.read_text(unicode_path), "café ☕")
+            self.assertEqual(estimator.read_text(invalid_path), "good\ufffdbad")
 
     def test_markdown_cli_reports_unicode_totals(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
