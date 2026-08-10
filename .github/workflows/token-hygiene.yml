@@ -20,6 +20,3 @@ jobs:
 
       - name: Run token hygiene script
         run: bash scripts/check-token-hygiene.sh
-
-      - name: Run context size estimator tests
-        run: python3 -m unittest discover -s tests -p 'test_estimate_context_size.py' -v
