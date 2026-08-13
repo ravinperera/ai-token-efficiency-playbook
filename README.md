@@ -109,6 +109,8 @@ For lower-model selection and escalation rules, see the [practical model-routing
 
 For long-running chats and assistants, see the [long-lived assistant guidance](guidelines/context-hygiene.md#long-lived-assistants).
 
+For the repository's operating assumptions and residual limitations, see the [repository safety assumptions](docs/safety-assumptions.md).
+
 ## Why This Matters
 
 Token waste normally comes from four places:
