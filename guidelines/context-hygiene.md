@@ -61,6 +61,12 @@ monitor context usage -> compact before the limit -> verify the summary -> conti
 
 This playbook documents the operating principle only. Semantic memory graphs, automatic conflict and staleness management, background consolidation agents, and platform-specific integrations such as OpenClaw remain future work.
 
+## Multi-Agent Context
+
+Multi-agent systems need an additional check: smaller context per agent does not necessarily mean fewer tokens overall. Scope evidence by role, hand off stable references instead of repeated state, and add specialist agents only when their value justifies coordination overhead.
+
+See [multi-agent context efficiency](multi-agent-context-efficiency.md) for practical role scoping, pointer-based handoffs, batching, orchestration anti-patterns, and total-cost measurement.
+
 ## Before Sending A Prompt
 
 Ask:
