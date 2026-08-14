@@ -94,6 +94,8 @@ single-agent total cost vs multi-agent total cost at comparable quality and safe
 
 A multi-agent workflow can still be worthwhile when it costs more if it materially improves correctness, review independence, latency through safe parallelism, or risk control. Record that trade-off explicitly rather than labeling it a token saving.
 
+Use the [multi-agent orchestration cost benchmark](../benchmarks/multi-agent-orchestration-cost.md) and its reusable measurement template when comparing workflow designs.
+
 ## Handoff Checklist
 
 Before sending work to another agent, ask:
