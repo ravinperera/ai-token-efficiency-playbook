@@ -65,8 +65,25 @@ class EstimateContextSizeTests(unittest.TestCase):
                 text=True,
             )
 
-            self.assertIn("| **Total** | 15 | 14 | 3 | 4 | 4 |", result.stdout)
+            self.assertIn("| **Total** | 15 | 14 | 3 | 2 | 4 |", result.stdout)
             self.assertIn("est_tokens is approximate", result.stdout)
+
+    def test_cli_reports_original_byte_size_for_invalid_utf8(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "invalid.bin"
+            path.write_bytes(b"\xff\n")
+
+            result = subprocess.run(
+                [sys.executable, str(SCRIPT_PATH), str(path)],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+
+            self.assertIn(
+                "bytes=2 chars=2 words=1 lines=1 est_tokens=1",
+                result.stdout,
+            )
 
     def test_missing_path_is_warned_and_skipped(self) -> None:
         result = subprocess.run(
