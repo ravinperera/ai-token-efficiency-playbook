@@ -15,7 +15,7 @@ check_instruction_file() {
   fi
 
   local lines
-  lines=$(wc -l < "$file" | tr -d ' ')
+  lines=$(awk 'END { print NR }' "$file")
 
   if [ "$lines" -gt "$MAX_INSTRUCTION_LINES" ]; then
     echo "instruction-too-large: $file has $lines lines; limit is $MAX_INSTRUCTION_LINES"
