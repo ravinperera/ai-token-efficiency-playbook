@@ -54,10 +54,10 @@ def main() -> int:
 
     for path in iter_files(args.paths):
         text = read_text(path)
-        byte_count = len(text.encode("utf-8"))
+        byte_count = path.stat().st_size
         char_count = len(text)
         word_count = len(text.split())
-        line_count = text.count("\n") + (1 if text else 0)
+        line_count = len(text.splitlines())
         token_estimate = estimate_tokens(text)
         rows.append((str(path), byte_count, char_count, word_count, line_count, token_estimate))
         totals[0] += byte_count
