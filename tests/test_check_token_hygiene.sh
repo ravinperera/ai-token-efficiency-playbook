@@ -81,6 +81,13 @@ expect_failure \
   bash -c "cd '$repo' && MAX_INSTRUCTION_LINES=2 bash '$CHECK_SCRIPT'"
 
 repo=$(new_repo)
+printf 'one\ntwo\nthree' > "$repo/AGENTS.md"
+expect_failure \
+  "oversized instruction file without final newline" \
+  "instruction-too-large: AGENTS.md has 3 lines" \
+  bash -c "cd '$repo' && MAX_INSTRUCTION_LINES=2 bash '$CHECK_SCRIPT'"
+
+repo=$(new_repo)
 dd if=/dev/zero of="$repo/untracked.log" bs=1024 count=16 status=none
 expect_success \
   "untracked files are outside staged check" \
