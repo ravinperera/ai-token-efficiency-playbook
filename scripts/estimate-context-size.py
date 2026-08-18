@@ -15,13 +15,22 @@ from typing import Iterable
 
 
 def iter_files(paths: Iterable[str]) -> Iterable[Path]:
+    seen: set[Path] = set()
     for raw_path in paths:
         path = Path(raw_path)
         if path.is_dir():
             for child in sorted(path.rglob("*")):
                 if child.is_file() and ".git" not in child.parts:
+                    canonical = child.resolve()
+                    if canonical in seen:
+                        continue
+                    seen.add(canonical)
                     yield child
         elif path.is_file():
+            canonical = path.resolve()
+            if canonical in seen:
+                continue
+            seen.add(canonical)
             yield path
         else:
             print(f"warning: skipped missing path: {path}", file=sys.stderr)
