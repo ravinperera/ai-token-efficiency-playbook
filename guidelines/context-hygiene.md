@@ -32,6 +32,18 @@ Bad context includes:
 - Replace long logs with summaries.
 - Keep project memory under active maintenance.
 
+## Progressive Repository Retrieval
+
+For codebase work, use progressive disclosure instead of treating a full file as the default retrieval unit:
+
+```text
+metadata / search -> structure / outline -> relevant symbol or range -> full file only when justified
+```
+
+Persistent symbol indexes or code graphs can help discover architecture without repeatedly rereading source, but cached structure must be tied to the correct repository/revision and verified against authoritative files when freshness or correctness matters.
+
+See [progressive context retrieval](progressive-context-retrieval.md) for structural views, persistent code memory, context receipts, canonical project context, and safe escalation rules.
+
 ## Long-Lived Assistants
 
 Long-lived conversational assistants should treat these as separate stores:
@@ -59,7 +71,7 @@ A simple runtime pattern is:
 monitor context usage -> compact before the limit -> verify the summary -> continue or rotate the session
 ```
 
-This playbook documents the operating principle only. Semantic memory graphs, automatic conflict and staleness management, background consolidation agents, and platform-specific integrations such as OpenClaw remain future work.
+This playbook documents operating principles rather than implementing a memory runtime. Automated conflict resolution, background consolidation agents, and platform-specific memory integrations remain implementation-specific work.
 
 ## Multi-Agent Context
 
