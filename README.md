@@ -51,6 +51,7 @@ Ready-to-copy instruction files and supporting material:
 │   ├── token-saving-principles.md
 │   ├── coding-agent-guidelines.md
 │   ├── context-hygiene.md
+│   ├── progressive-context-retrieval.md
 │   ├── cli-output-compression.md
 │   ├── document-to-markdown.md
 │   ├── model-routing.md
@@ -91,6 +92,7 @@ AI agents should:
 
 - Use context hygiene before optimizing response style.
 - Search before reading large files.
+- Use progressive retrieval: discover structure first, then load the smallest relevant symbol or range.
 - Read the smallest relevant file range.
 - Convert text-heavy documents to searchable Markdown before loading whole documents or screenshot collections.
 - Keep the original visual only when layout, charts, diagrams, or image content affect the answer.
@@ -102,6 +104,8 @@ AI agents should:
 - Preserve technical accuracy over extreme compression.
 
 For tool-specific context risks, see the [per-tool token waste notes](guidelines/per-tool-notes.md).
+
+For codebase discovery, structural views, persistent code indexes, context receipts, and canonical project context, see [progressive context retrieval](guidelines/progressive-context-retrieval.md).
 
 For common mistakes and fixes, see the [token waste anti-patterns catalogue](guidelines/anti-patterns.md).
 
@@ -255,7 +259,7 @@ Use this playbook when working with:
 
 - AI coding agents
 - terminal-based AI tools
-- large codebases
+- large codebases and codebases with reusable structural indexes
 - text-heavy documents and screenshot collections
 - CI/CD logs
 - infrastructure-as-code projects
