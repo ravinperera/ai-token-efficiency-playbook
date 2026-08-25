@@ -173,4 +173,4 @@ Treat their performance claims as project-specific until reproduced on your own 
 
 ## Measurement
 
-When evaluating this approach, compare the complete workflow rather than one tool response. Capture task success alongside tokens, bytes, tool calls, latency, freshness failures, and indexing overhead so local efficiency does not hide total workflow cost.
+When evaluating this approach, compare the complete workflow rather than one tool response. Use the [structural memory retrieval benchmark](../benchmarks/structural-memory-retrieval.md) and capture task success alongside tokens, bytes, tool calls, latency, freshness failures, and indexing overhead so local efficiency does not hide total workflow cost.
