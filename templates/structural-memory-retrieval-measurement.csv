@@ -1,0 +1,1 @@
+run_id,repository,revision,task_id,mode,index_state,index_build_seconds,input_tokens,output_tokens,bytes_returned,model_turns,tool_calls,retrieval_latency_ms,total_elapsed_seconds,fallback_source_reads,stale_index_detected,incorrect_selections,task_success,verification_result,safety_boundary_result,estimated_cost,notes
