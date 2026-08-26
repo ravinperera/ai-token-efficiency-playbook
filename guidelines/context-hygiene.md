@@ -71,7 +71,9 @@ A simple runtime pattern is:
 monitor context usage -> compact before the limit -> verify the summary -> continue or rotate the session
 ```
 
-This playbook documents operating principles rather than implementing a memory runtime. Automated conflict resolution, background consolidation agents, and platform-specific memory integrations remain implementation-specific work.
+For deterministic triggers, structured continuation checkpoints, memory provenance, targeted retrieval, safe replacement, recovery, and measurement, see [runtime memory and compaction](runtime-memory-compaction.md) and the [continuation checkpoint template](../templates/continuation-checkpoint.md).
+
+This playbook documents operating principles rather than implementing a memory runtime. Platform-specific compaction APIs, storage backends, and background consolidation remain implementation choices that should follow the same safety and measurement principles.
 
 ## Multi-Agent Context
 
