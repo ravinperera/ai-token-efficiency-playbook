@@ -42,3 +42,6 @@ jobs:
 
       - name: Test token hygiene checker
         run: bash tests/test_check_token_hygiene.sh
+
+      - name: Test instruction installer
+        run: sh tests/test_install.sh
