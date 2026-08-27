@@ -12,9 +12,19 @@ Most token waste comes from oversized context, repeated memory, noisy logs, and 
 
 ## 30-Second Install
 
-Pick your tool, copy the matching file into your repository, and commit it.
+Run the installer from the root of the repository that should receive the instruction file. Replace `codex` with `claude`, `gemini`, `copilot`, or `cursor` as needed.
 
-| Tool | Copy this file |
+```bash
+curl -fsSL https://raw.githubusercontent.com/ravinperera/ai-token-efficiency-playbook/main/scripts/install.sh | sh -s -- codex
+```
+
+The installer maps each tool to its canonical file and **refuses to overwrite an existing file**. Review an existing instruction file first; use `--force` only when replacement is intentional.
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/ravinperera/ai-token-efficiency-playbook/main/scripts/install.sh | sh -s -- --force codex
+```
+
+| Tool | Installed file |
 | --- | --- |
 | Codex / general coding agents | `AGENTS.md` |
 | Claude Code | `CLAUDE.md` |
@@ -22,11 +32,7 @@ Pick your tool, copy the matching file into your repository, and commit it.
 | GitHub Copilot | `.github/copilot-instructions.md` |
 | Cursor | `.cursor/rules/token-efficiency.mdc` |
 
-```bash
-cp AGENTS.md /path/to/your-repo/AGENTS.md
-```
-
-For best results, also copy the canonical guidance in `guidelines/` and the checklist in `checklists/token-efficiency-checklist.md`.
+For best results, also use the canonical guidance in `guidelines/` and the checklist in `checklists/token-efficiency-checklist.md`.
 
 ## What This Provides
 
@@ -67,10 +73,12 @@ Ready-to-copy instruction files and supporting material:
 │   └── dynamic-resource-discovery.md
 ├── scripts/
 │   ├── check-token-hygiene.sh
-│   └── estimate-context-size.py
+│   ├── estimate-context-size.py
+│   └── install.sh
 ├── tests/
 │   ├── test_check_token_hygiene.sh
-│   └── test_estimate_context_size.py
+│   ├── test_estimate_context_size.py
+│   └── test_install.sh
 ├── templates/
 │   ├── ci-failure-triage.md
 │   ├── document-context-extraction.md
@@ -219,14 +227,15 @@ To produce rough before/after context-size numbers for a case study, use the dep
 python3 scripts/estimate-context-size.py before.md after.md --markdown
 ```
 
-Run the helper regression tests before changing file discovery, thresholds, encoding, totals, or output formats:
+Run the helper regression tests before changing file discovery, thresholds, encoding, totals, installer behaviour, or output formats:
 
 ```bash
 python3 -m unittest discover -s tests -p 'test_estimate_context_size.py' -v
 bash tests/test_check_token_hygiene.sh
+sh tests/test_install.sh
 ```
 
-The shell suite verifies staged filenames containing spaces, log and context thresholds, instruction-size limits, untracked-file behavior, and the non-Git fallback. GitHub Actions runs both dependency-free suites on pull requests and pushes to `main`.
+The shell suites verify staged filenames containing spaces, log and context thresholds, instruction-size limits, untracked-file behavior, safe installer overwrite behaviour, nested tool paths, and the non-Git fallback. GitHub Actions runs the dependency-free suites on pull requests and pushes to `main`.
 
 With pre-commit:
 
