@@ -34,6 +34,8 @@ curl -fsSL https://raw.githubusercontent.com/ravinperera/ai-token-efficiency-pla
 
 For best results, also use the canonical guidance in `guidelines/` and the checklist in `checklists/token-efficiency-checklist.md`.
 
+For what is validated by this repository versus what still requires live client testing, see the [adapter compatibility and verification matrix](docs/adapter-compatibility.md).
+
 ## What This Provides
 
 Ready-to-copy instruction files and supporting material:
@@ -69,8 +71,11 @@ Ready-to-copy instruction files and supporting material:
 │   ├── case-study-ci-log-triage.md
 │   └── image-vs-markdown-context.md
 ├── benchmarks/
+│   ├── evaluation-corpus.md
 │   ├── document-conversion-measurement.md
-│   └── dynamic-resource-discovery.md
+│   ├── dynamic-resource-discovery.md
+│   ├── multi-agent-orchestration-cost.md
+│   └── structural-memory-retrieval.md
 ├── scripts/
 │   ├── check-token-hygiene.sh
 │   ├── estimate-context-size.py
