@@ -30,6 +30,14 @@ Generate a Markdown table for a case study:
 python3 scripts/estimate-context-size.py before.md after.md --markdown
 ```
 
+For CI or repeatable benchmarks, fail rather than silently measuring a partial input set when a requested path is missing:
+
+```bash
+python3 scripts/estimate-context-size.py before.md after.md --fail-on-missing
+```
+
+Without `--fail-on-missing`, the helper keeps its interactive-friendly behaviour: missing paths are warned about and skipped.
+
 ## How to use the numbers
 
 Use the same files, tool, and measurement method before and after the change. Record the result in [`templates/token-savings-measurement.md`](../templates/token-savings-measurement.md).
