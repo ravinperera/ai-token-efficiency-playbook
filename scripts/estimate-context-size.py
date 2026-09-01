@@ -56,7 +56,19 @@ def main() -> int:
         action="store_true",
         help="Print a Markdown table suitable for case studies",
     )
+    parser.add_argument(
+        "--fail-on-missing",
+        action="store_true",
+        help="Return a non-zero exit code if any explicitly requested input path is missing",
+    )
     args = parser.parse_args()
+
+    if args.fail_on_missing:
+        missing_paths = [Path(raw_path) for raw_path in args.paths if not Path(raw_path).exists()]
+        if missing_paths:
+            for path in missing_paths:
+                print(f"error: missing path: {path}", file=sys.stderr)
+            return 2
 
     rows: list[tuple[str, int, int, int, int, int]] = []
     totals = [0, 0, 0, 0, 0]
