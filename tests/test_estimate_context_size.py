@@ -99,6 +99,23 @@ class EstimateContextSizeTests(unittest.TestCase):
             result.stdout,
         )
 
+    def test_fail_on_missing_returns_nonzero_without_silent_measurement(self) -> None:
+        result = subprocess.run(
+            [
+                sys.executable,
+                str(SCRIPT_PATH),
+                "does-not-exist.md",
+                "--fail-on-missing",
+            ],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("error: missing path: does-not-exist.md", result.stderr)
+        self.assertNotIn("total:", result.stdout)
+
 
 if __name__ == "__main__":
     unittest.main()
