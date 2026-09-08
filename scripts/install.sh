@@ -1,17 +1,20 @@
 #!/bin/sh
 set -eu
 
-BASE_URL="${TOKEN_EFFICIENCY_BASE_URL:-https://raw.githubusercontent.com/ravinperera/ai-token-efficiency-playbook/main}"
+BASE_URL_OVERRIDE="${TOKEN_EFFICIENCY_BASE_URL:-}"
 SOURCE_ROOT="${TOKEN_EFFICIENCY_SOURCE_ROOT:-}"
+source_ref="${TOKEN_EFFICIENCY_SOURCE_REF:-main}"
 force=0
 tool=""
 
 usage() {
   cat <<'EOF'
-Usage: install.sh [--force] <codex|claude|gemini|copilot|cursor>
+Usage: install.sh [--force] [--source-ref REF] <codex|claude|gemini|copilot|cursor>
 
 Installs the matching token-efficiency instruction file into the current repository.
 Existing files are never overwritten unless --force is supplied.
+Use --source-ref with a release tag or commit SHA for a reproducible remote install.
+TOKEN_EFFICIENCY_SOURCE_REF provides the same default non-interactively.
 EOF
 }
 
@@ -19,6 +22,15 @@ while [ "$#" -gt 0 ]; do
   case "$1" in
     --force)
       force=1
+      ;;
+    --source-ref)
+      shift
+      if [ "$#" -eq 0 ] || [ -z "$1" ]; then
+        echo "--source-ref requires a non-empty ref." >&2
+        usage >&2
+        exit 2
+      fi
+      source_ref="$1"
       ;;
     -h|--help)
       usage
@@ -91,9 +103,14 @@ else
     echo "curl is required when TOKEN_EFFICIENCY_SOURCE_ROOT is not set." >&2
     exit 4
   }
+  if [ -n "$BASE_URL_OVERRIDE" ]; then
+    base_url="$BASE_URL_OVERRIDE"
+  else
+    base_url="https://raw.githubusercontent.com/ravinperera/ai-token-efficiency-playbook/$source_ref"
+  fi
   tmp="${destination}.tmp.$$"
   trap 'rm -f "$tmp"' EXIT HUP INT TERM
-  curl -fsSL "$BASE_URL/$source_path" -o "$tmp"
+  curl -fsSL "$base_url/$source_path" -o "$tmp"
   mv "$tmp" "$destination"
   trap - EXIT HUP INT TERM
 fi
