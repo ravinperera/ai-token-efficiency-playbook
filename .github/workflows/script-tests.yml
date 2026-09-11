@@ -33,11 +33,11 @@ jobs:
           git fetch --no-tags --depth=1 origin "${REF}"
           git checkout --detach FETCH_HEAD
 
-      - name: Test context-size estimator
+      - name: Run Python helper tests
         run: |
           python3 -m unittest discover \
             -s tests \
-            -p 'test_estimate_context_size.py' \
+            -p 'test_*.py' \
             -v
 
       - name: Test token hygiene checker
