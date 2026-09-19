@@ -57,6 +57,7 @@ Ready-to-copy instruction files and supporting material:
 │   └── architecture-mode.md
 ├── guidelines/
 │   ├── token-saving-principles.md
+│   ├── minimum-necessary-implementation.md
 │   ├── coding-agent-guidelines.md
 │   ├── context-hygiene.md
 │   ├── progressive-context-retrieval.md
@@ -112,6 +113,7 @@ AI agents should:
 - Summarise large logs instead of repeating them.
 - Avoid restating unchanged context.
 - Keep persistent instruction and memory files short.
+- Check whether new code is needed before creating abstractions, dependencies, or custom implementations.
 - Use the lowest approved model tier capable of the task.
 - Escalate early when security, production, architecture, ambiguity, sensitive data, or repeated failure appears.
 - Preserve technical accuracy over extreme compression.
@@ -119,6 +121,8 @@ AI agents should:
 For tool-specific context risks, see the [per-tool token waste notes](guidelines/per-tool-notes.md).
 
 For codebase discovery, structural views, persistent code indexes, context receipts, and canonical project context, see [progressive context retrieval](guidelines/progressive-context-retrieval.md).
+
+For implementation minimality, reuse-first decisions, and total-engineering-output measurement, see [minimum-necessary implementation](guidelines/minimum-necessary-implementation.md).
 
 For common mistakes and fixes, see the [token waste anti-patterns catalogue](guidelines/anti-patterns.md).
 
