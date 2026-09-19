@@ -75,6 +75,14 @@ For deterministic triggers, structured continuation checkpoints, memory provenan
 
 This playbook documents operating principles rather than implementing a memory runtime. Platform-specific compaction APIs, storage backends, and background consolidation remain implementation choices that should follow the same safety and measurement principles.
 
+## Reversible Compression
+
+When a summary could hide evidence that may be needed later, keep the authoritative source retrievable instead of treating the summary as a destructive replacement. Preserve recent and decision-critical material, record what was omitted, and retrieve the smallest relevant original range when exact evidence is required.
+
+Also account for provider prompt caching: repeatedly rewriting an otherwise stable prefix can reduce raw tokens while losing cache benefits. A compression step should fall back to the original when it increases token use, loses required evidence, or makes verification harder.
+
+See [reversible context compression](reversible-context-compression.md) for the operating pattern, retrieval and retention controls, cache-aware guidance, inflation guard, and [benchmark protocol](../benchmarks/reversible-context-compression.md).
+
 ## Multi-Agent Context
 
 Multi-agent systems need an additional check: smaller context per agent does not necessarily mean fewer tokens overall. Scope evidence by role, hand off stable references instead of repeated state, and add specialist agents only when their value justifies coordination overhead.
