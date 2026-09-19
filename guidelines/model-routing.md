@@ -68,10 +68,74 @@ Use this sequence before starting substantial work:
 1. Confirm approved provider, model family, and data boundary.
 2. Classify task risk and reversibility.
 3. Estimate reasoning and context complexity.
-4. Choose the lowest capable approved tier.
-5. Run the smallest useful verification.
-6. Escalate when a trigger is reached; do not loop repeatedly.
+4. Set an optional task/request budget or quota policy.
+5. Choose the lowest capable approved tier.
+6. Run the smallest useful verification.
+7. Escalate or use an approved fallback when a trigger is reached; do not loop repeatedly.
+8. Record the route, fallbacks, cost/cache signals, and verification outcome when routing is measured or governed.
 ```
+
+## Budget And Quota Controls
+
+A budget ceiling can prevent simple work from consuming unbounded model spend, but cost controls must never weaken data-handling or safety requirements.
+
+Where the host supports it, define one or more of:
+
+- maximum estimated or actual cost per request/task;
+- maximum model attempts or retries;
+- maximum input/output token budget;
+- provider or subscription quota threshold;
+- maximum latency where a faster approved tier is acceptable.
+
+When the ceiling is reached, the valid outcomes are: stop and report the limit, reduce non-essential context, use a cheaper **already-approved** route that still meets the task, or request explicit approval for a higher budget. Do not cross an unapproved provider, tenancy, region, retention policy, or model family merely to stay under budget.
+
+Do not hard-code provider prices into durable policy. Pricing, subscription coverage, cache discounts, and quota rules change; record the source and date when they affect a measurement.
+
+## Governed Fallbacks
+
+Rate limits, quota exhaustion, model unavailability, and transient provider errors need a defined fallback policy.
+
+A safe fallback should:
+
+1. remain inside the same approved data boundary unless an explicitly approved alternative exists;
+2. preserve the minimum capability needed by the task;
+3. keep the same security and retention constraints;
+4. record why the fallback happened;
+5. re-run the required verification on the fallback result;
+6. stop rather than silently degrading when no approved capable route remains.
+
+Fallbacks are not a reason to retry indefinitely. Count fallback attempts as part of the task's retry and cost budget.
+
+## Cache Affinity
+
+For repeated work with stable instructions or large shared prefixes, routing back to a model/provider path that can reuse valid prompt-cache state may reduce latency or cost. Treat cache affinity as an optimisation signal, not a correctness rule.
+
+Use it only when:
+
+- the candidate route is already approved and capable;
+- the cached prefix is still valid for the current project/revision;
+- cache use does not prevent a required model escalation;
+- provider cache telemetry or policy is understood well enough to measure the effect.
+
+Do not keep using a weaker model solely to preserve a cache hit. Risk and capability outrank cache savings.
+
+## Routing Telemetry
+
+For benchmarks, automated routers, or governed environments, record enough information to explain the decision without logging sensitive prompt content unnecessarily:
+
+- task or request identifier;
+- risk class and required capability tier;
+- selected provider/model class or approved route identifier;
+- budget/quota state at decision time;
+- fallback or escalation reason;
+- attempt and retry count;
+- input/output and cached-token classes when exposed;
+- estimated and actual cost where available;
+- latency;
+- verification result;
+- final route actually used.
+
+Prefer metadata over raw prompts for routine routing telemetry. Apply the same retention and access controls as other AI usage logs.
 
 ## Mandatory Escalation Triggers
 
@@ -89,7 +153,7 @@ Escalate from economy/fast to balanced or advanced reasoning when any of these o
 
 Retry a failed economy-tier attempt at most once when the failure is clearly transient or easily corrected. Otherwise escalate the tier or stop and report the blocker.
 
-## Automatic Routing vs Recommendation
+## Automatic Routing Vs Recommendation
 
 Some agent hosts can select a model programmatically; others cannot.
 
@@ -103,11 +167,12 @@ Example recommendation:
 ```text
 Recommended tier: Economy / fast
 Reason: Documentation formatting only; no code or security decisions.
+Budget: Low-cost route; stop after one failed attempt.
 Verification: Markdown lint and link check.
 Escalate if: Source documents conflict or technical claims require validation.
 ```
 
-## Verification by Tier
+## Verification By Tier
 
 Lower-cost routing must not remove validation.
 
@@ -138,6 +203,8 @@ Do not:
 - use an economy model for a high-risk one-line change;
 - keep retrying a weak model to avoid escalation cost;
 - send confidential content to a cheaper but unapproved provider;
+- silently cross provider, tenancy, region, retention, or training boundaries during fallback;
+- preserve cache affinity when the task requires a stronger model;
 - use an advanced model for deterministic formatting that a simple tool can perform;
 - claim savings without recording the model, task, context, result, and verification;
 - assume model names map permanently to the same capability tier.
@@ -146,6 +213,10 @@ Do not:
 
 Use [`templates/model-routing-decision.md`](../templates/model-routing-decision.md) when routing decisions need to be visible or measured.
 
+## Upstream Inspiration And Attribution
+
+The budget/quota, fallback, caching, and observability additions were informed by the cost-aware gateway patterns documented by [BunsDev/omniroute](https://github.com/BunsDev/omniroute), reviewed 2026-09-19. This playbook keeps those ideas vendor-neutral and does not embed OmniRoute's provider pricing, quota tables, or marketing claims as durable facts.
+
 ## Practical Rule
 
-> If a task does not require deep reasoning, do not pay for deep reasoning. If risk or ambiguity rises, escalate early rather than paying for repeated weak attempts.
+> If a task does not require deep reasoning, do not pay for deep reasoning. If risk or ambiguity rises, escalate early rather than paying for repeated weak attempts. Cost-aware fallback is useful only while it stays inside the approved capability and data boundary.
