@@ -29,6 +29,14 @@ See [progressive context retrieval](../guidelines/progressive-context-retrieval.
 - [ ] Preserve security, production, architecture, compliance, and ambiguity escalation rules even when optimizing tokens.
 - [ ] Do not trade away exact evidence, required human approval, or independent verification merely to shorten context.
 
+## Skills And Specialist Resources
+
+- [ ] Discover skills or specialist procedures on demand instead of preloading an entire library into every session.
+- [ ] Load the smallest sufficient skill set and remove unrelated skills when the task changes.
+- [ ] Record the skill source, version or commit, platform prerequisites, and material dependencies when reproducibility matters.
+- [ ] Treat skill discovery as context selection, not as permission to install software, call external services, publish, delete, or cross data boundaries.
+- [ ] Use the [selective skill loading guide](../guidelines/selective-skill-loading.md) when a runtime supports reusable skills, plugins, or procedural instruction packs.
+
 ## Long-Lived Sessions And Memory
 
 - [ ] Keep active working context separate from durable memory and searchable full history.
