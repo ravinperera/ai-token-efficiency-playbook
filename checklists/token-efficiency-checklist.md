@@ -40,9 +40,12 @@ See [progressive context retrieval](../guidelines/progressive-context-retrieval.
 ## Measure Claims
 
 - [ ] If claiming token or context savings, compare equivalent tasks with the same required evidence and success criteria.
+- [ ] Attribute usage to the task, tool, model tier, and project when telemetry allows; record cache tokens, retries, and escalations separately rather than hiding them inside one total.
+- [ ] Distinguish measured billed cost from API-equivalent estimates or allocated subscription cost, and record the pricing source/date for estimates.
+- [ ] Track outcome-oriented metrics such as cost per successful task, retry tax, cache-hit ratio, and routing waste only when their calculation method is explicit and reproducible.
 - [ ] Record input/output tokens or a clearly documented proxy, tool calls, latency, correctness, fallback reads, and relevant indexing/compaction overhead.
 - [ ] Do not publish a universal saving percentage from one example, one provider, or one repository.
-- [ ] Use the [evaluation corpus](../benchmarks/evaluation-corpus.md) and relevant benchmark protocol when a repeatable comparison is useful.
+- [ ] Use the [token observability and attribution guide](../guidelines/token-observability.md), [evaluation corpus](../benchmarks/evaluation-corpus.md), and relevant benchmark protocol when a repeatable comparison is useful.
 
 ## After The Task
 
