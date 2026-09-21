@@ -115,6 +115,12 @@ Compare selective loading with preloading using the same task and success criter
 
 A selective approach is useful only if it preserves task quality and required safety controls.
 
+## Reusable Skill Manifest
+
+Use [`templates/agent-skill-manifest.md`](../templates/agent-skill-manifest.md) to keep discovery metadata small and portable. The manifest records identity, immutable source/version, runtime prerequisites, dependencies, permissions, external actions, expected inputs/outputs, reproducibility metadata, refresh triggers, and human-accountability requirements without preloading the skill's full procedure.
+
+The manifest is descriptive metadata, not an authorization grant. A runtime must still enforce its own permission, approval, installation, network, data-boundary, and high-risk review controls before executing the skill.
+
 ## Upstream Inspiration
 
 [K-Dense Scientific Agent Skills](https://github.com/K-Dense-AI/scientific-agent-skills) is one useful example of a large, portable collection of procedural skills for specialist workflows. Its skill-oriented packaging, explicit scientific tooling, reproducibility emphasis, and warnings around installing only needed skills informed this guide. This playbook does not copy the repository's skill content or treat its compatibility, adoption, or performance claims as independently verified facts.
