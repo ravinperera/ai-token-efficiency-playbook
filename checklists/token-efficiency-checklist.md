@@ -53,7 +53,7 @@ See [progressive context retrieval](../guidelines/progressive-context-retrieval.
 - [ ] Track outcome-oriented metrics such as cost per successful task, retry tax, cache-hit ratio, and routing waste only when their calculation method is explicit and reproducible.
 - [ ] Record input/output tokens or a clearly documented proxy, tool calls, latency, correctness, fallback reads, and relevant indexing/compaction overhead.
 - [ ] Do not publish a universal saving percentage from one example, one provider, or one repository.
-- [ ] Use the [token observability and attribution guide](../guidelines/token-observability.md), [evaluation corpus](../benchmarks/evaluation-corpus.md), and relevant benchmark protocol when a repeatable comparison is useful.
+- [ ] Use the [token observability and attribution guide](../guidelines/token-observability.md), [`token-observability-measurement.csv`](../templates/token-observability-measurement.csv), [evaluation corpus](../benchmarks/evaluation-corpus.md), and relevant benchmark protocol when a repeatable comparison is useful.
 
 ## After The Task
 
