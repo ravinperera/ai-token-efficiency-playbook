@@ -16,6 +16,7 @@ Use this before and during an AI coding, debugging, review, or research session.
 - [ ] Prefer `metadata/search -> structure/outline -> relevant symbol or range -> full file only when justified`.
 - [ ] Query a trusted structural index or durable project memory before rediscovering stable repository facts, when one is available.
 - [ ] Verify indexed or remembered facts against source when freshness, authorization, or correctness could have changed.
+- [ ] Record provenance, freshness, exclusions, escalation, source fallback, and verification for material indexed/graph retrievals using the [context retrieval receipt](../templates/context-retrieval-receipt.md).
 - [ ] Convert text-heavy documents to searchable text/Markdown first; retain visuals only when layout, diagrams, charts, handwriting, or image content matter.
 - [ ] Summarise noisy tool output and keep the exact failing lines, identifiers, commands, and nearby evidence required for verification.
 
