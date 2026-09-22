@@ -14,6 +14,8 @@ For each case:
 
 Do not add real credentials, account IDs, customer data, private source code, or production logs to these fixtures. If you replace a fixture with organisation-specific data, keep a redacted synthetic copy for reproducible public measurements.
 
+For publishable or repeated comparisons, complete the [benchmark run manifest](../templates/benchmark-run-manifest.md) alongside the raw result. Pin the source/input revision, model/client/tool/skill versions, instruction revision, cache state, pricing basis, telemetry source, and verification method; record `unknown` rather than guessing values the provider does not expose.
+
 ## EC-01 — CI log triage
 
 **Task:** Identify the first actionable failure, preserve the exact error, and propose the smallest next verification step.
