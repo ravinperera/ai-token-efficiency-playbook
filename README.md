@@ -10,6 +10,14 @@ This project is not just about making AI replies shorter. The main thesis is:
 
 Most token waste comes from oversized context, repeated memory, noisy logs, and using the wrong model for the job. This playbook focuses on **context hygiene** and **model routing** so AI tools stay useful without carrying unnecessary token load.
 
+## The playbook at a glance
+
+[![Icon-led overview of the efficiency workflow, progressive retrieval, context architecture, governed model routing, and cost per verified outcome.](docs/images/token-efficiency-overview.png)](docs/images/token-efficiency-overview.png)
+
+Select the image to view it at full size, or read the [accessible text companion and linked guides](docs/visual-overview.md).
+
+This is a conceptual overview, not an implemented runtime or a measured savings claim. Keep authoritative evidence and governance boundaries intact.
+
 ## 30-Second Install
 
 Run the installer from the root of the repository that should receive the instruction file. Replace `codex` with `claude`, `gemini`, `copilot`, or `cursor` as needed.
