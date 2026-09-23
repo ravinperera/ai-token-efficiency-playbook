@@ -65,6 +65,27 @@ Before relying on it for a material decision:
 - verify high-impact conclusions against authoritative files;
 - keep project boundaries explicit so results from one codebase do not leak into another.
 
+### Provenance-Aware Relationships
+
+Structural memory can mix facts that are mechanically extracted from source with relationships proposed by a model or heuristic. Keep those categories visible instead of flattening every edge into the same confidence level.
+
+A vendor-neutral provenance vocabulary can be as simple as:
+
+- **extracted** — directly derived from authoritative source or deterministic parsing, with a resolvable file/symbol/range anchor;
+- **inferred** — proposed by a model or heuristic from available evidence; record the supporting anchors and confidence/uncertainty signal when available;
+- **ambiguous** — plausible but conflicting, under-specified, or not safely resolvable without review.
+
+For material conclusions:
+
+- an inferred relationship should never silently become equivalent to a source-extracted fact;
+- confidence is supporting metadata, not proof;
+- every material graph/index relationship should be traceable to source anchors or explicitly marked as lacking them;
+- ambiguous relationships should trigger source retrieval or human review rather than being resolved by guesswork;
+- stale or unknown index state lowers trust regardless of provenance label;
+- derived clusters, communities, similarity links, or summaries remain secondary evidence until verified against source where correctness matters.
+
+This is especially important for blast-radius analysis, security review, architecture decisions, migrations, and changes that depend on complete caller/dependency coverage.
+
 ## 4. Make Context Consumption Observable
 
 Where the runtime exposes enough telemetry, record a small context receipt for meaningful reads.
@@ -79,6 +100,7 @@ estimated or provider-reported input tokens
 tool calls
 bytes or sections avoided, if measured
 freshness / index revision
+relationship provenance / source anchors when graph results matter
 reason for escalation to a larger view
 ```
 
@@ -95,6 +117,7 @@ Examples:
 - A symbol search finds the handler, but a bug fix requires its implementation and tests.
 - A call graph identifies callers, but an API change requires reading the compatibility layer.
 - A structural outline shows configuration keys, but a security review requires exact default values and validation logic.
+- A semantic graph proposes a dependency with inferred provenance, but a migration decision requires confirming the exact source relationship.
 
 A useful escalation note is short:
 
@@ -143,10 +166,11 @@ Do not block evidence required for correctness. Security-sensitive and productio
 1. identify the task and authoritative repository/ref
 2. search for candidate files/symbols
 3. query structure or persistent index if available
-4. read the smallest relevant implementation range
-5. expand to callers/tests/config only when the decision requires it
-6. verify against source when using cached or indexed knowledge
-7. record total workflow cost when benchmarking
+4. inspect relationship provenance/source anchors when graph results matter
+5. read the smallest relevant implementation range
+6. expand to callers/tests/config only when the decision requires it
+7. verify inferred, ambiguous, stale, or high-impact conclusions against source
+8. record total workflow cost when benchmarking
 ```
 
 ## When Full-File Reads Are Reasonable
@@ -168,9 +192,10 @@ These public projects illustrate useful implementation patterns without defining
 - [Graft](https://github.com/flyingrobots/graft) demonstrates governed structural reads, refusals, and context receipts.
 - [codebase-memory-mcp](https://github.com/DeusData/codebase-memory-mcp) demonstrates a persistent structural code index and graph-style queries.
 - [OpenMontage](https://github.com/open-montage/OpenMontage) demonstrates a canonical shared project context with tool- and stage-specific knowledge loaded as needed.
+- [graphify](https://github.com/rhanka/graphify) demonstrates a deterministic structural pass plus provenance-labelled semantic relationships, including explicit extracted, inferred, and ambiguous states. Reviewed 2026-09-23; the repository is MIT-licensed.
 
-Treat their performance claims as project-specific until reproduced on your own workload. The playbook deliberately keeps the pattern vendor-neutral.
+Treat their performance claims as project-specific until reproduced on your own workload. The playbook deliberately keeps the pattern vendor-neutral and does not copy implementation code or ontology choices.
 
 ## Measurement
 
-When evaluating this approach, compare the complete workflow rather than one tool response. Use the [structural memory retrieval benchmark](../benchmarks/structural-memory-retrieval.md) and capture task success alongside tokens, bytes, tool calls, latency, freshness failures, and indexing overhead so local efficiency does not hide total workflow cost.
+When evaluating this approach, compare the complete workflow rather than one tool response. Use the [structural memory retrieval benchmark](../benchmarks/structural-memory-retrieval.md) and capture task success alongside tokens, bytes, tool calls, latency, freshness failures, relationship-provenance failures, and indexing overhead so local efficiency does not hide total workflow cost.
