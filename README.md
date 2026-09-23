@@ -233,7 +233,7 @@ The same check can also run in CI. See [`docs/token-hygiene-ci.md`](docs/token-h
 To produce rough before/after context-size numbers for a case study, use the dependency-free estimator documented in [`docs/context-size-estimator.md`](docs/context-size-estimator.md):
 
 ```bash
-python3 scripts/estimate-context_size.py before.md after.md --markdown
+python3 scripts/estimate-context-size.py before.md after.md --markdown
 ```
 
 Run the helper regression tests before changing file discovery, thresholds, encoding, totals, installer behaviour, or output formats:
