@@ -131,6 +131,12 @@ Ask these questions before changing prompts or model policy:
 - Do not optimise for token count alone when retries, latency, quality, or cache behaviour move in the opposite direction.
 - Keep counterfactual savings assumptions explicit and reproducible.
 
+## Reusable Measurement Template
+
+Use [`templates/token-observability-measurement.csv`](../templates/token-observability-measurement.csv) to record comparable runs without storing prompt or source content. The template separates uncached and cached input, retries, escalations, fallbacks, cost views, pricing assumptions, retry-tax inputs, routing counterfactuals, verification results, and the telemetry source.
+
+Leave unavailable fields blank or mark them `unknown`; do not fabricate provider telemetry to make the record complete. When a routing-waste estimate is recorded, retain the reproducible counterfactual route and cost basis that produced it.
+
 ## Upstream Inspiration
 
 [CodeBurn](https://github.com/getagentseal/codeburn) is one useful example of local-first, cross-tool usage attribution. Its project/model/task breakdowns, cache-aware accounting, retry-tax analysis, and routing-waste concepts informed this guide. This playbook does not depend on CodeBurn, copy its implementation, or adopt its pricing or savings claims as universal facts.

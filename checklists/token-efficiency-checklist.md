@@ -16,6 +16,7 @@ Use this before and during an AI coding, debugging, review, or research session.
 - [ ] Prefer `metadata/search -> structure/outline -> relevant symbol or range -> full file only when justified`.
 - [ ] Query a trusted structural index or durable project memory before rediscovering stable repository facts, when one is available.
 - [ ] Verify indexed or remembered facts against source when freshness, authorization, or correctness could have changed.
+- [ ] Record provenance, freshness, exclusions, escalation, source fallback, and verification for material indexed/graph retrievals using the [context retrieval receipt](../templates/context-retrieval-receipt.md).
 - [ ] Convert text-heavy documents to searchable text/Markdown first; retain visuals only when layout, diagrams, charts, handwriting, or image content matter.
 - [ ] Summarise noisy tool output and keep the exact failing lines, identifiers, commands, and nearby evidence required for verification.
 
@@ -35,7 +36,7 @@ See [progressive context retrieval](../guidelines/progressive-context-retrieval.
 - [ ] Load the smallest sufficient skill set and remove unrelated skills when the task changes.
 - [ ] Record the skill source, version or commit, platform prerequisites, and material dependencies when reproducibility matters.
 - [ ] Treat skill discovery as context selection, not as permission to install software, call external services, publish, delete, or cross data boundaries.
-- [ ] Use the [selective skill loading guide](../guidelines/selective-skill-loading.md) when a runtime supports reusable skills, plugins, or procedural instruction packs.
+- [ ] Use the [selective skill loading guide](../guidelines/selective-skill-loading.md) and [`agent-skill-manifest.md`](../templates/agent-skill-manifest.md) when a runtime supports reusable skills, plugins, or procedural instruction packs.
 
 ## Long-Lived Sessions And Memory
 
@@ -53,7 +54,7 @@ See [progressive context retrieval](../guidelines/progressive-context-retrieval.
 - [ ] Track outcome-oriented metrics such as cost per successful task, retry tax, cache-hit ratio, and routing waste only when their calculation method is explicit and reproducible.
 - [ ] Record input/output tokens or a clearly documented proxy, tool calls, latency, correctness, fallback reads, and relevant indexing/compaction overhead.
 - [ ] Do not publish a universal saving percentage from one example, one provider, or one repository.
-- [ ] Use the [token observability and attribution guide](../guidelines/token-observability.md), [evaluation corpus](../benchmarks/evaluation-corpus.md), and relevant benchmark protocol when a repeatable comparison is useful.
+- [ ] Use the [token observability and attribution guide](../guidelines/token-observability.md), [`token-observability-measurement.csv`](../templates/token-observability-measurement.csv), [evaluation corpus](../benchmarks/evaluation-corpus.md), and relevant benchmark protocol when a repeatable comparison is useful.
 
 ## After The Task
 
