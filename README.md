@@ -122,7 +122,7 @@ For tool-specific context risks, see the [per-tool token waste notes](guidelines
 
 For codebase discovery, structural views, persistent code indexes, context receipts, and canonical project context, see [progressive context retrieval](guidelines/progressive-context-retrieval.md).
 
-For implementation minimality, reuse-first decisions, and total-engineering-output measurement, see [minimum-necessary implementation](guidelines/minimum-necessary-implementation.md).
+For implementation minimality, reuse-first decisions, and total-engineering-output measurement, see [minimum-necessary implementation](guidelines/minimum-necessary-implementation.md). To compare implementation strategies reproducibly, use the [minimum-necessary implementation benchmark](benchmarks/minimum-necessary-implementation.md).
 
 For common mistakes and fixes, see the [token waste anti-patterns catalogue](guidelines/anti-patterns.md).
 
