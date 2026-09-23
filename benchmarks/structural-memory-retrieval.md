@@ -52,6 +52,26 @@ warm index: valid index already exists for the pinned revision
 
 Do not present a warm-query result as the total cost of first use. Likewise, do not charge every later query the full historical indexing cost unless that reflects the real deployment model.
 
+## Relationship Provenance Test
+
+When a structural system mixes deterministic parsing with semantic/model-derived relationships, test provenance quality separately from graph-query speed.
+
+Classify material relationships as:
+
+- **extracted** — directly derived from authoritative source or deterministic parsing with a resolvable source anchor;
+- **inferred** — proposed by a model or heuristic and supported by source anchors plus confidence/uncertainty metadata where available;
+- **ambiguous** — conflicting or insufficient evidence that requires source retrieval or review.
+
+Include at least one task where an inferred or ambiguous relationship could change the answer. Record whether the system:
+
+1. exposes the provenance class rather than flattening all relationships into one certainty level;
+2. provides a usable source anchor for material relationships;
+3. avoids presenting an inferred relationship as an authoritative source fact;
+4. escalates ambiguous or unsupported relationships to source retrieval/review;
+5. preserves the distinction after caching, refresh, export, or graph reconstruction.
+
+A high confidence score does not convert an inference into extracted evidence.
+
 ## Required Measurements
 
 Capture at least:
@@ -69,6 +89,10 @@ Capture at least:
 - stale or incomplete-index failures;
 - fallback source reads;
 - incorrect file/symbol selections;
+- material relationships by provenance class where graph results matter;
+- unsupported inferred relationships;
+- ambiguous relationships escalated for review;
+- missing or broken source anchors;
 - estimated or measured cost where available.
 
 If a tool reports "bytes avoided" or similar receipts, record them as tool telemetry, not as a substitute for measured total tokens.
@@ -93,6 +117,8 @@ Define the expected answer before comparing modes. A simple score can include:
 required files/symbols found
 irrelevant files/symbols selected
 call/dependency relationships correct
+relationship provenance labels correct where applicable
+material source anchors resolve correctly
 required tests/config identified
 final answer passes independent verification
 ```
@@ -107,9 +133,10 @@ Record whether each mode:
 - respected excluded paths and data classifications;
 - attempted to read secrets, binaries, lockfiles, or generated artifacts unnecessarily;
 - relied on stale cached state for a material conclusion;
+- treated inferred or ambiguous relationships as facts without verification;
 - expanded context beyond what the task required.
 
-A retrieval layer may be worth using even when total tokens are similar if it materially improves safety or boundary enforcement. Record that as a trade-off, not a token saving.
+A retrieval layer may be worth using even when total tokens are similar if it materially improves safety, provenance, or boundary enforcement. Record that as a trade-off, not a token saving.
 
 ## Suggested Run Sequence
 
@@ -120,9 +147,10 @@ For each mode:
 2. pin the repository revision
 3. execute the same task
 4. capture every model/tool interaction metric available
-5. verify the answer independently
-6. record failures and fallbacks
-7. repeat enough times to expose variance
+5. verify relationship provenance/source anchors when graph results matter
+6. verify the answer independently
+7. record failures and fallbacks
+8. repeat enough times to expose variance
 ```
 
 Where non-determinism is material, use multiple runs per mode and report median plus range rather than one best run.
@@ -134,7 +162,7 @@ Compare complete workflow totals.
 Good evidence looks like:
 
 ```text
-Mode C used fewer total input tokens than Modes A and B at the same task-success level, including the measured warm-query overhead. Cold indexing cost is reported separately, and stale-index tests passed because the runtime detected revision mismatch.
+Mode C used fewer total input tokens than Modes A and B at the same task-success level, including the measured warm-query overhead. Cold indexing cost is reported separately, stale-index tests passed because the runtime detected revision mismatch, and material inferred relationships were source-verified before use.
 ```
 
 Weak evidence looks like:
@@ -143,10 +171,14 @@ Weak evidence looks like:
 The graph query returned 120 tokens, therefore the system saves 99%.
 ```
 
-The second statement ignores indexing, tool envelopes, model turns, fallback reads, correctness, and workload differences.
+The second statement ignores indexing, tool envelopes, model turns, fallback reads, correctness, provenance quality, and workload differences.
 
 ## Reusable Data Template
 
 Record individual runs in [`../templates/structural-memory-retrieval-measurement.csv`](../templates/structural-memory-retrieval-measurement.csv).
 
 Do not publish a generalized saving percentage until comparable runs across representative tasks and repositories support it. Tool-vendor benchmark claims may be useful hypotheses, but this playbook treats them as unverified until independently reproduced.
+
+## Pattern Reference
+
+The explicit distinction between extracted, inferred, and ambiguous relationships was informed by [rhanka/graphify](https://github.com/rhanka/graphify), reviewed 2026-09-23. Graphify is MIT-licensed and combines deterministic structural parsing with semantic extraction that retains relationship provenance. This benchmark adopts the vendor-neutral verification principle only; it does not copy Graphify's implementation or treat its published token estimates as local evidence.
