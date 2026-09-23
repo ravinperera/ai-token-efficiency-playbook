@@ -62,6 +62,8 @@ Do not treat token count as the only success metric. Compare approaches using th
 
 A lower-token answer that creates more code, dependencies, retries, or review effort can be a net loss.
 
+For a reproducible comparison, use the [minimum-necessary implementation benchmark](../benchmarks/minimum-necessary-implementation.md) and its [raw measurement template](../templates/minimum-necessary-implementation-measurement.csv). The benchmark keeps acceptance criteria and required safeguards fixed so shorter code cannot win by silently dropping required behaviour.
+
 ## Practical Examples
 
 | Request | Prefer | Avoid |
@@ -82,4 +84,4 @@ Use this as a design question, not a demand for the fewest possible lines.
 
 ## Upstream Inspiration and Attribution
 
-This guidance was informed by the decision-ladder idea in [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail), reviewed 2026-09-19. Ponytail is MIT-licensed and publishes its own benchmark results. This playbook does **not** adopt those percentages as general facts; quantitative savings must be reproduced on the local evaluation corpus and environment before being claimed here.
+This guidance was informed by the decision-ladder idea in [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail), reviewed 2026-09-23. Ponytail is MIT-licensed and publishes its own benchmark results. This playbook does **not** adopt those percentages as general facts; quantitative savings must be reproduced on the local evaluation corpus and environment before being claimed here.
