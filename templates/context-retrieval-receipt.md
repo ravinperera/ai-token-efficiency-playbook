@@ -25,6 +25,19 @@ Keep the receipt metadata-focused. Do not copy prompts, source code, secrets, cu
 
 If the retrieval layer cannot prove which source revision it represents, record freshness as `unknown` and verify material conclusions against authoritative source.
 
+## Relationship provenance
+
+Complete this section when graph/index relationships materially influence the answer.
+
+- Relationship classes observed: `extracted | inferred | ambiguous | mixed | not applicable`
+- Material source anchors present: `yes | no | partial | not applicable`
+- Confidence/uncertainty metadata present for inferred relationships: `yes | no | not applicable`
+- Ambiguous relationships requiring review:
+- Material inferred relationships independently verified against source: `yes | no | not required`
+- Unsupported or unresolvable relationships observed:
+
+`extracted` means directly derived from authoritative source or deterministic parsing. `inferred` means proposed by a model or heuristic. `ambiguous` means the evidence is conflicting or insufficient. A confidence score is metadata, not proof.
+
 ## Context returned
 
 - Files/symbols/sections selected:
@@ -44,7 +57,7 @@ Do not convert a tool-reported "bytes avoided" value into a token-saving claim u
 - Fallback source/ref:
 - Fallback result:
 
-Typical fallback triggers include stale or unknown index state, incomplete relationships, missing generated/runtime behaviour, security-sensitive conclusions, and decisions that depend on exact implementation details.
+Typical fallback triggers include stale or unknown index state, incomplete relationships, inferred or ambiguous material relationships, missing source anchors, missing generated/runtime behaviour, security-sensitive conclusions, and decisions that depend on exact implementation details.
 
 ## Boundary and safety checks
 
@@ -59,9 +72,10 @@ Typical fallback triggers include stale or unknown index state, incomplete relat
 - Verification method:
 - Result: `pass | fail | partial | not run`
 - Stale/incomplete retrieval affected the answer: `yes | no | unknown`
+- Provenance uncertainty affected the answer: `yes | no | unknown`
 - Final decision verified against authoritative source where required: `yes | no | not required`
 - Notes:
 
 ## Interpretation
 
-A smaller retrieval is not automatically better. Compare the complete workflow, including index build/refresh cost, retries, fallbacks, verification, correctness, and task outcome. A receipt is evidence about what context was consumed and why; it is not itself proof of a saving.
+A smaller retrieval is not automatically better. Compare the complete workflow, including index build/refresh cost, retries, fallbacks, verification, correctness, task outcome, and provenance quality. A receipt is evidence about what context was consumed and why; it is not itself proof of a saving.
