@@ -59,6 +59,7 @@ See [progressive context retrieval](../guidelines/progressive-context-retrieval.
 ## After The Task
 
 - [ ] Keep the final handoff concise: outcome, changed facts, verification, unresolved risks, and next action.
+- [ ] When transferring work between agents, people, or sessions, use the [handoff template](../templates/handoff-template.md) to bind the next step to durable state, ownership, approvals, and an exact revision instead of replaying broad context.
 - [ ] Save only durable project knowledge; leave transient logs and working notes out of persistent context.
 - [ ] Record a reusable lesson only when it changes future retrieval, routing, verification, or safety behaviour.
 - [ ] Start the next task with a clean context rather than carrying unrelated material forward.
