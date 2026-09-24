@@ -2,7 +2,7 @@
 
 **Status:** Experimental protocol; no token-saving claim is made until comparable runs are measured.
 
-This benchmark compares a well-scoped single-agent workflow with a multi-agent workflow that performs the same task. It is designed to catch a common measurement error: smaller context per specialist can still produce higher total token use once coordinator prompts, handoffs, retries, and review turns are included.
+This benchmark compares a well-scoped single-agent workflow with a multi-agent workflow that performs the same task. It is designed to catch a common measurement error: smaller context per specialist can still produce higher total token use once coordinator prompts, handoffs, retries, merge/rebase work, and review turns are included.
 
 ## Question
 
@@ -52,7 +52,10 @@ For each run record:
 - validation result;
 - task success;
 - human corrections required;
-- safety or approval failures.
+- safety or approval failures;
+- isolated workspace strategy, such as shared checkout, branch, worktree, or sandbox;
+- merge/rebase/conflict events and time spent resolving them;
+- stale-handoff or wrong-revision failures.
 
 If the platform does not expose one of these token categories separately, leave it unknown rather than inventing a value. The overall provider/client total is more important than a guessed breakdown.
 
@@ -65,7 +68,18 @@ Record whether handoffs use:
 - stable references such as commit SHAs, issue IDs, artifact paths, or versioned records;
 - a mixture of the above.
 
-Also record the approximate or reported handoff size. This helps distinguish savings caused by role specialization from savings caused by better state referencing.
+Also record:
+
+- whether each worker had isolated write state or shared a mutable workspace;
+- the base revision and exact handoff revision when available;
+- whether the recipient verified that the referenced state still existed and was current;
+- whether merge/rebase/conflict work was required before the next stage;
+- whether approval or merge authority was explicit at the handoff;
+- the approximate or reported handoff size.
+
+This helps distinguish savings caused by role specialization from savings caused by better state referencing, while also exposing hidden coordination cost from stale branches, shared-workspace collisions, or ambiguous ownership.
+
+Use [`../templates/handoff-template.md`](../templates/handoff-template.md) when a compact durable transfer record is useful. The benchmark does not require a specific orchestration framework or git worktree implementation.
 
 ## Suggested Task
 
@@ -92,8 +106,8 @@ Use at least five runs per arm for each task. Alternate or randomise arm order a
 | Scope | No unrelated changes or broad refactor |
 | Validation | Required non-destructive checks pass, or limitation is explicit |
 | Safety | No approval bypass, secret exposure, destructive action, or permission widening |
-| Handoff quality | Multi-agent state transfer is unambiguous and sufficient |
-| Evidence | Token, timing, workflow, and outcome data are recorded |
+| Handoff quality | State transfer is unambiguous, revision-bound, current, and sufficient |
+| Evidence | Token, timing, workflow, merge/rework, and outcome data are recorded |
 
 A lower-token run is not successful if it reduces correctness or safety.
 
@@ -123,9 +137,10 @@ Publish or retain:
 - repository commit SHA;
 - client and model versions where available;
 - role definitions for the multi-agent arm;
+- workspace isolation strategy and handoff revision scheme;
 - run order and count;
 - raw measurements;
-- failed runs and retries;
+- failed runs, retries, merge conflicts, and stale-handoff events;
 - success and safety results;
 - aggregation method;
 - limitations and hidden token categories.
