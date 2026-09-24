@@ -2,7 +2,7 @@
 
 This page records what the repository actually validates for each shipped AI-tool adapter. It deliberately separates **repository-level verification** from **live runtime compatibility** with a particular vendor client version.
 
-Review date: **2026-08-28**
+Review date: **2026-09-24**
 
 | Tool / adapter | Instruction file | Installer selector | Repository-validated | Live client version verified here | Known limitation |
 | --- | --- | --- | --- | --- | --- |
@@ -26,6 +26,25 @@ The repository can verify properties it owns:
 
 These checks are useful but **do not prove that every current or future version of an external AI client will discover, parse, prioritise, or obey the file exactly as intended**.
 
+## Canonical Source And Drift Control
+
+Keep shared policy in one canonical location and treat tool-specific files as adapters, not independent policy copies. When adapters are rendered, converted, synchronised, or maintained across several clients, record enough provenance to distinguish intentional provider differences from silent drift.
+
+A useful adapter record includes:
+
+- canonical source path, immutable ref/hash when reproducibility matters, and logical policy/agent identity;
+- target tool, destination and scope;
+- transform/renderer and version when one is used;
+- explicit provider-specific override delta rather than a second full policy copy;
+- rendered/adapter hash and drift state;
+- repository validation plus exact live-client verification where available.
+
+Use [`../templates/agent-adapter-manifest.md`](../templates/agent-adapter-manifest.md) for a reusable record.
+
+Suggested drift states are `current`, `source-outdated`, `locally modified`, `missing`, `foreign/unmanaged`, and `unknown`. A matching file hash proves only file identity; it does not prove that the client discovered, prioritised, or followed the instructions. If two copies changed independently, resolve the conflict deliberately rather than treating modification time as authority.
+
+This pattern is informed by public cross-tool agent-management projects such as [graft](https://github.com/Zealbase/graft) and [Agency Agents](https://github.com/msitarzewski/agency-agents-app), both MIT-licensed and reviewed on 2026-09-24. This repository adopts only the vendor-neutral provenance and drift-control principles; it does not copy their schemas, implementation, prompts, or compatibility claims.
+
 ## Runtime verification guidance
 
 When a specific client/version matters to an organisation:
@@ -40,4 +59,4 @@ Do not convert a repository test date into a vendor compatibility claim. If a li
 
 ## Maintenance rule
 
-Re-review this matrix whenever an adapter path, installer selector, or validation behaviour changes. Runtime-version claims should only be added when there is reproducible evidence for that exact client/version and should include the verification date and test method.
+Re-review this matrix whenever an adapter path, installer selector, canonical source, transform, or validation behaviour changes. Runtime-version claims should only be added when there is reproducible evidence for that exact client/version and should include the verification date and test method.
