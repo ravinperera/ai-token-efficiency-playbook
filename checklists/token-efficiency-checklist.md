@@ -25,6 +25,7 @@ See [progressive context retrieval](../guidelines/progressive-context-retrieval.
 ## For Coding Agents
 
 - [ ] Keep one canonical project policy and make provider-specific instruction files thin adapters rather than duplicated policy copies.
+- [ ] When the same agent/policy is maintained across tools, use the [agent adapter manifest](../templates/agent-adapter-manifest.md) to record canonical provenance, explicit provider deltas, drift state, and real compatibility evidence.
 - [ ] Ask the agent to read only the files, symbols, or ranges needed for the current step.
 - [ ] Use targeted tests and deterministic checks before broad test suites or repository-wide scans when the scope is narrow.
 - [ ] Preserve security, production, architecture, compliance, and ambiguity escalation rules even when optimizing tokens.
