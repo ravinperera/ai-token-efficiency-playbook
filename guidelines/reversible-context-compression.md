@@ -49,6 +49,8 @@ created_at: 2026-09-19T09:00:00Z
 
 The exact schema is implementation-specific. The important properties are provenance, retrievability, and enough description for the agent to know when it should fetch the original.
 
+For a reusable record, use [`../templates/context-compression-receipt.md`](../templates/context-compression-receipt.md). Keep receipts proportionate to the task; do not copy sensitive source content into the receipt when a stable reference is sufficient.
+
 ## Inflation Guard
 
 A transform is not useful merely because it is called compression.
