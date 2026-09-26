@@ -2,7 +2,7 @@
 
 Summaries reduce active context, but an irreversible summary can hide the exact evidence that later becomes important. For long-running agents, tool-heavy workflows, and large retrieval results, prefer **reversible compression** when omitted source material may need to be inspected again.
 
-The goal is not to keep every byte in the prompt. The goal is to keep the active prompt small **without destroying the path back to authoritative evidence**.
+The goal is not to keep every byte in the prompt. The goal is to keep the active prompt small **without destroying the path back to authoritative evidence**. Here, “reversible” means that omitted evidence remains retrievable from its authoritative source; it does not mean the compressed representation can reconstruct the original by itself.
 
 ## Core Pattern
 
@@ -129,4 +129,4 @@ Use [`../benchmarks/reversible-context-compression.md`](../benchmarks/reversible
 
 ## Upstream Inspiration And Attribution
 
-This guidance was informed by the reversible compression, retrieval, cache-alignment, and content-routing patterns described by [dschumann/Headroom](https://github.com/dschumann/Headroom), reviewed 2026-09-19. The playbook adopts the vendor-neutral design principles, not Headroom's published percentage-savings claims. Any quantitative claim here must be reproduced on the local evaluation corpus and runtime.
+This guidance was informed by the reversible compression, retrieval, cache-alignment, and content-routing patterns described by [headroomlabs-ai/headroom](https://github.com/headroomlabs-ai/headroom) (Apache-2.0; reviewed 2026-09-26). The playbook adopts the vendor-neutral design principles, not Headroom's published percentage-savings claims. Any quantitative claim here must be reproduced on the local evaluation corpus and runtime.
