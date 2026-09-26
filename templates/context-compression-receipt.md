@@ -1,6 +1,6 @@
 # Context Compression Receipt
 
-Use this receipt when context is compressed, compacted, deduplicated, or replaced with references while the original evidence remains retrievable.
+Use this receipt when context is compressed, compacted, deduplicated, or replaced with references while the authoritative evidence remains separately retrievable. Here, **reversible** means the workflow can return to that source; it does not mean the compact representation can reconstruct the original by itself.
 
 ## Source
 
@@ -32,12 +32,13 @@ Use this receipt when context is compressed, compacted, deduplicated, or replace
 
 ## Reversibility
 
-- Authoritative original still available: Yes / No
+- Authoritative original retained separately: Yes / No
 - Retrieval mechanism:
 - Smallest retrievable unit:
 - Retrieval reference validated: Yes / No
+- Access/authorisation rechecked at retrieval time: Yes / No / N/A
 - Expected expiry/retention:
-- Behaviour if source expires or is deleted:
+- Behaviour if source expires, is deleted, becomes unavailable, or access is revoked:
 
 ## Cache Behaviour
 
