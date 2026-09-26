@@ -15,13 +15,22 @@ from typing import Iterable
 
 
 def iter_files(paths: Iterable[str]) -> Iterable[Path]:
+    seen: set[Path] = set()
     for raw_path in paths:
         path = Path(raw_path)
         if path.is_dir():
             for child in sorted(path.rglob("*")):
                 if child.is_file() and ".git" not in child.parts:
+                    canonical = child.resolve()
+                    if canonical in seen:
+                        continue
+                    seen.add(canonical)
                     yield child
         elif path.is_file():
+            canonical = path.resolve()
+            if canonical in seen:
+                continue
+            seen.add(canonical)
             yield path
         else:
             print(f"warning: skipped missing path: {path}", file=sys.stderr)
@@ -47,17 +56,29 @@ def main() -> int:
         action="store_true",
         help="Print a Markdown table suitable for case studies",
     )
+    parser.add_argument(
+        "--fail-on-missing",
+        action="store_true",
+        help="Return a non-zero exit code if any explicitly requested input path is missing",
+    )
     args = parser.parse_args()
+
+    if args.fail_on_missing:
+        missing_paths = [Path(raw_path) for raw_path in args.paths if not Path(raw_path).exists()]
+        if missing_paths:
+            for path in missing_paths:
+                print(f"error: missing path: {path}", file=sys.stderr)
+            return 2
 
     rows: list[tuple[str, int, int, int, int, int]] = []
     totals = [0, 0, 0, 0, 0]
 
     for path in iter_files(args.paths):
         text = read_text(path)
-        byte_count = len(text.encode("utf-8"))
+        byte_count = path.stat().st_size
         char_count = len(text)
         word_count = len(text.split())
-        line_count = text.count("\n") + (1 if text else 0)
+        line_count = len(text.splitlines())
         token_estimate = estimate_tokens(text)
         rows.append((str(path), byte_count, char_count, word_count, line_count, token_estimate))
         totals[0] += byte_count

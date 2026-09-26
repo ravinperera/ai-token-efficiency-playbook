@@ -80,7 +80,7 @@ class EstimateContextSizeTests(unittest.TestCase):
             "| Path | Bytes | Characters | Words | Lines | Est. tokens |",
             completed.stdout,
         )
-        self.assertIn("| **Total** | 11 | 11 | 3 | 3 | 3 |", completed.stdout)
+        self.assertIn("| **Total** | 11 | 11 | 3 | 2 | 3 |", completed.stdout)
         self.assertIn("est_tokens is approximate", completed.stdout)
 
 

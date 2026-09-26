@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/ravinperera/ai-token-efficiency-playbook/security/policy
+    about: Report suspected vulnerabilities or sensitive security concerns using the repository security policy.
