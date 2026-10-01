@@ -2,6 +2,8 @@
 
 Use this template when model selection affects cost, latency, capability, data handling, or safety.
 
+For comparative experiments, pair this policy record with the [routing benchmark record](model-routing-benchmark-record.md), which captures every attempt and reconciles full-run totals.
+
 ## Task
 
 - Request:
