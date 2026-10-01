@@ -6,7 +6,9 @@ This project follows a lightweight, documentation-first changelog. Versions are 
 
 ## [Unreleased]
 
-No changes recorded since the first tagged release.
+### Added
+
+- Optional cache-aware resource-discovery comparison covering stable selected tool sets, schema freshness, authorization and complete cache-cost accounting; protocol only, with no measured savings claim.
 
 ## [0.1.0] - 2026-10-01
 
