@@ -6,15 +6,26 @@ This project follows a lightweight, documentation-first changelog. Versions are 
 
 ## [Unreleased]
 
-### Added
+No changes recorded since the first tagged release.
 
-- Space for upcoming tool-specific instruction files, examples, templates, and hygiene checks.
+## [0.1.0] - 2026-10-01
 
-### Changed
+First tagged public release. The July baseline below records earlier development, not a previously published GitHub release.
 
-- Space for updates to guidance, checklists, and contributor workflow.
+### Included
 
-## [0.1.0] - 2026-07-09
+- Canonical guidance for context hygiene, progressive retrieval, reversible compression, selective skill loading, minimum-necessary implementation, governed model routing/fallback and multi-agent handoffs, monitoring and recovery.
+- Instruction adapters for Codex/general coding agents, Claude Code, Gemini CLI, GitHub Copilot and Cursor, with an explicit repository-validation versus live-client compatibility matrix.
+- Overwrite-protected installer with source-ref pinning, context-size/token-estimation helpers, and Markdown/local-link and token-hygiene checks with regression tests and GitHub Actions.
+- Templates for routing decisions, adapter/skill provenance, continuation handoffs, retrieval/compression receipts, benchmark manifests and token/cost measurement.
+- Fixed synthetic evaluation corpus and reproducible benchmark protocols for routing/fallback, orchestration, retrieval, compression, resource discovery, document conversion and minimum-necessary implementation. Protocols are not measured model benchmark results; existing fixture-based case studies retain their stated measurement limitations.
+- Original visual overview and accessible text companion, plus practical examples, contributor guidance and safety assumptions.
+
+See the [v0.1.0 release notes](docs/releases/v0.1.0.md) for scope and limitations. This is operating guidance and local tooling, not an implemented orchestration runtime, a universal savings claim or production certification.
+
+## Historical untagged baseline - 2026-07-09
+
+This entry preserves the original development summary. No release tag or GitHub release was published for this baseline date; it is not a separate version.
 
 ### Added
 
