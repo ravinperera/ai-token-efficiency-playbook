@@ -59,6 +59,43 @@ For each run record:
 
 If the platform does not expose one of these token categories separately, leave it unknown rather than inventing a value. The overall provider/client total is more important than a guessed breakdown.
 
+## Optional Whole-Runtime Resource Measurement
+
+Use this extension when session concurrency or host capacity matters. Token usage, host-resource efficiency and task quality are separate outcomes; none proves the others. Add observations alongside the existing run record rather than changing its CSV columns or inventing measurements.
+
+### Comparable Execution Scope
+
+Record the operating system, hardware, memory limits, runtime/client versions, build flags, model/effort, configured tools, telemetry mode, and memory/index/embedding features. Keep these matched between arms where possible. A run with embeddings or memory disabled is a different feature configuration, not an unexplained improvement over one with them enabled. Separate headless worker runs from interactive client runs.
+
+Use a declared concurrency series, the same bounded tasks and verified tool-bearing turns at each point, and the same sampling windows. Capture cold startup, idle/ready state, active work and the declared post-task observation window. Keep failed and interrupted sessions in the record. A rendered first frame, readiness to accept input and a correctly completed task need separate timestamps and acceptance criteria.
+
+### Process And Resource Accounting
+
+| Measurement | Recording rule |
+| --- | --- |
+| Process scope | Identify the unique client, daemon, worker, MCP and helper processes included; account for relevant short-lived children and exclusions |
+| Memory | Record the metric, units and sampler; use one consistent basis such as Linux PSS rather than comparing it directly with RSS or another platform's private-memory figure |
+| Sampled peak | Sum the included process measurements at each observation, then report the maximum sampled aggregate; do not sum independent per-process peaks from different times |
+| CPU | Record aggregate CPU time over the window; if using percentages, state sampling interval and core-normalization convention |
+| Shared runtime | Count a shared daemon/helper once in the system total, not once per session; disclose unrelated sessions or shared services that cannot be isolated |
+| Background activity | Include local indexing, embeddings, retrieval, memory extraction/consolidation and remote helper calls when enabled; record activity outside the main task window separately |
+
+Record an idle shared-runtime baseline and totals for each declared session count. For matched steady-state samples, a marginal value can be estimated as `(resource at N sessions - resource at M sessions) / (N - M)` for `N > M`; report the range and do not assume linear scaling. Do not apply that formula to unrelated feature configurations, mismatched sampling stages or incomparable memory metrics. Sampling can miss brief peaks: publish the interval and call the value a sampled peak, not an absolute maximum.
+
+If GPU/accelerator memory, remote services or short-lived processes are not observable, label them excluded/unknown. Do not present client-only measurements as the whole deployed system. A shared process boundary is not evidence of tenant isolation or authorization.
+
+### Background Helper Cost And Reporting
+
+Trace helper requests to a run/task with privacy-safe identifiers where supported. Include their input/output/cache usage and actual or clearly labelled estimated cost once in the complete workflow total. Coordinator, memory-sideagent, retrieval and verification categories are breakdowns of that total, not extra totals to add again. Hidden helper usage stays unknown rather than zero.
+
+Report background preparation and post-task work separately, with any amortization tied to a stated number of tasks. Keep measured wall-clock time distinct from summed concurrent worker durations. Cost per verified outcome includes unsuccessful attempts in its numerator; with zero verified outcomes, the ratio is undefined rather than zero. Report host resources, model cost, failures and quality together instead of translating RAM reduction into claimed token savings, cash savings or greater intelligence.
+
+This is a measurement protocol only. Running a harness benchmark requires separate approval for tools, authentication, model spend, telemetry, concurrency and the test environment. Read-only prompts do not make an upstream runner credential-free or free of process/network side effects.
+
+### Design Reference
+
+Inspired by [Jcode's headless memory benchmark](https://github.com/1jehuang/jcode/blob/5f1c091cf7682cbce781d08444cc19ffb7ec01d8/scripts/bench_headless_memory.py), inspected at `5f1c091cf7682cbce781d08444cc19ffb7ec01d8` on 2026-10-01 ([MIT licence](https://github.com/1jehuang/jcode/blob/5f1c091cf7682cbce781d08444cc19ffb7ec01d8/LICENSE)). The source motivates whole-process-tree, concurrent-session and tool-bearing-turn measurement; the controls above are this playbook's recommendations. No runner, authentication handling, vendor rankings or published memory/speed ratios are copied or executed, and no independent performance result is claimed.
+
 ## Handoff Measurement
 
 Record whether handoffs use:
