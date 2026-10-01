@@ -79,6 +79,45 @@ Record:
 
 Run the task without the external catalogue. This can help show whether either resource-loading method added value, but it is not required for the primary comparison.
 
+### Optional Arm D: cache-aware selected tool set
+
+For a fixed multi-turn version of the same task, use Arm B's discovery and selection policy, but reuse cached schemas for selected resources and keep their order and serialized definitions stable while they remain relevant and current. Do not preload the whole catalogue merely to preserve a cache hit. Do not force Arm B to rediscover or reorder tools unnecessarily to manufacture an advantage; record its actual behaviour, including when it is already equivalent to D.
+
+This extension asks whether local schema reuse and stable prompt content offset discovery/reconciliation overhead at comparable quality. They are separate factors: vary them independently where practical, or label D a combined intervention rather than attributing its result to one mechanism.
+
+#### Cache controls and records
+
+Keep the task sequence, approved catalogue, selection policy, model settings, permissions and success rubric fixed. Distinguish the local schema cache from the provider's prompt cache; one being warm does not establish that the other is warm.
+
+Record the following alongside each run's existing measurement record, without changing the established CSV columns:
+
+| Field | Required interpretation |
+| --- | --- |
+| Tool snapshot | Selected tool identifiers, schema/version identity, serialized order/hash and observed changes per turn |
+| Local cache state | Cold, deliberately primed, invalidated or unknown; priming source/revision and configuration identity |
+| Provider cache state | Cold, deliberately primed or unknown; reported cache reads/writes/hits where available |
+| Retrieval work | Discovery/handshake/reconciliation calls, latency, failed invocations and schema bytes or measured tokens |
+| End-to-end outcome | All attempts, input/output usage, billable cost basis, task verification and safety result |
+
+Use separate fresh sessions and cache stores per arm. A warm-cache comparison needs matched, documented priming within each arm, not state inherited from a previous arm. Report cold-start, preparation and warm steady-state costs separately, plus an amortized total for a declared number of tasks. Do not add cached-input counts to an input total that already includes them, or count discovery/helper calls twice. Unknown cache usage or hidden schema tokens stay unknown; fewer bytes do not prove lower billed cost.
+
+#### Freshness and authorization scenarios
+
+Apply the same predetermined fixture changes to each compared arm and retain failed runs:
+
+- a selected tool changes its description or input schema;
+- server configuration, identity or endpoint changes;
+- a selected tool is removed, access is revoked, or the server cannot be reached;
+- a later task requires a different tool set.
+
+A cached description is a hint, not proof of availability, identity or authorization. Reconcile with live definitions and recheck permissions before invocation; a configuration fingerprint alone does not grant trust. Stale, conflicting or unverifiable state requires refresh or a safe stop, not an invocation based on the old snapshot. Revocation, current task needs and required verification outrank cache preservation. Keep credentials and sensitive configuration values out of benchmark records; record only approved opaque identities or sanitized change evidence.
+
+Count stale-schema use, unapproved calls, missed tool changes and unnecessary tool retention alongside cost and latency. Record a safe stop separately from successful task completion. No result from this optional arm is claimed until measured.
+
+#### Design reference
+
+The schema-cache pattern is informed by [Jcode's MCP schema cache](https://github.com/1jehuang/jcode/blob/5f1c091cf7682cbce781d08444cc19ffb7ec01d8/crates/jcode-base/src/mcp/schema_cache.rs), inspected at `5f1c091cf7682cbce781d08444cc19ffb7ec01d8` on 2026-10-01 ([MIT licence](https://github.com/1jehuang/jcode/blob/5f1c091cf7682cbce781d08444cc19ffb7ec01d8/LICENSE)). That source describes configuration-keyed schema caching and reconciliation after connection. Selective-set experiments and the authorization controls above are this playbook's recommendations, not claims that Jcode implements them all. No upstream code, automatic cache-hit guarantee or performance percentage is adopted.
+
 ## Required controls
 
 Keep these fixed across Arms A and B:
