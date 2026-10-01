@@ -52,6 +52,35 @@ wake-up signal != durable task state != full history
 
 This reduces repeated context and makes recovery easier when an agent session is restarted.
 
+## Observe Progress Without Replaying Terminal History
+
+A coordinator can waste context by repeatedly asking a model to inspect unchanged terminal output. When the runtime supports them, prefer bounded event subscriptions or server-side waits over model-driven polling loops. A wait must have a deadline and a cancellation path; unavailable event support calls for bounded polling with backoff, not an invented background capability.
+
+Use a small observation cycle:
+
+```text
+bind the intended task and runtime target
+-> wait for relevant activity or a deadline
+-> read the smallest useful new output
+-> verify the task-specific result
+```
+
+- Bind the machine, session, current agent/process identity, task identifier and source revision. A pane label or UI focus alone is insufficient, especially across machines or after reconnecting.
+- Check the current state and use atomic submit-and-wait, an event cursor, or an equivalent race-safe mechanism where available. An old success message or a different occupant must not satisfy the current task's wait.
+- Request bounded text output or a relevant artifact first. Distinguish model-visible context from terminal bytes that never entered a model request. Do not request extra screenshots or replay the full transcript when a small text result is enough.
+- Treat runtime labels such as working, blocked, idle, done and unknown as observation signals with integration-specific meanings. Readiness for another prompt is not verified task success; an approval dialog is not authorization to approve.
+- On timeout or disconnection, inspect authoritative state before resubmitting. A lost reply does not prove the prompt or command was never delivered. After reconnecting, refresh stale state and re-establish interrupted waits rather than trusting an old subscription.
+
+### Reconnect Before Reconstructing
+
+Separate three recovery cases: reattaching to surviving processes, restoring terminal layout/history after processes died, and resuming an agent's native conversation. The latter two do not prove that a test, deployment or other external action is still running or should be repeated.
+
+Discover the actual recovery case, reconcile the task and its artifacts, then retrieve only the missing evidence. Do not restart an entire swarm or feed it full history solely because the client disconnected. Replayed terminal text is historical evidence, not a live completion signal.
+
+### Measure Monitoring Overhead
+
+For the same tasks, agents and verification criteria, compare periodic output reads with event-driven observation. Record model-visible monitoring tokens as a subset of total workflow tokens, duplicate output, observation calls, missed/stale events, detection latency, recovery effort and verified outcomes. Include server-side wait overhead and failed runs; fewer tool calls alone do not prove lower cost. No saving is claimed without comparable measurements.
+
 ## Batch Similar Review Work Carefully
 
 When several same-priority handoffs require the same review role, consider batching their identifiers and loading each relevant diff or artifact on demand. This can avoid repeatedly loading identical policy, repository, or tool context.
@@ -108,3 +137,7 @@ Before sending work to another agent, ask:
 - Will the total workflow still be measured rather than only this agent's context?
 
 For a reusable structure, see [`../templates/handoff-template.md`](../templates/handoff-template.md).
+
+## Runtime Coordination Design Reference
+
+The observation and recovery guidance is informed by [Herdr's agent skill](https://github.com/herdrdev/herdr/blob/d6b40d4edd550ccea081f089605a64314f8c8b27/skills/herdr/SKILL.md), reviewed at commit `d6b40d4edd550ccea081f089605a64314f8c8b27` on 2026-10-01, and its [socket API](https://herdr.dev/docs/socket-api/) and [session-state documentation](https://herdr.dev/docs/session-state/) reviewed on the same date. The pinned repository [licence](https://github.com/herdrdev/herdr/blob/d6b40d4edd550ccea081f089605a64314f8c8b27/LICENSE) is Apache-2.0. These are original, vendor-neutral adaptations; no runtime implementation, bundled skill, or performance claim is copied. Herdr is not installed or required by this playbook. Validate supported waits and state semantics against the actual installed runtime version.
