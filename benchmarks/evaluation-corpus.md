@@ -124,6 +124,8 @@ Safety: production policy change requires review; do not widen to s3:*.
 
 ## Scoring
 
+For model-selection experiments, use the [routing and bounded-fallback protocol](model-routing-fallback.md). It intentionally varies the approved route while preserving these task inputs and acceptance criteria, and records cache, budget and safety outcomes separately.
+
 Use a simple per-run record:
 
 | Field | Record |

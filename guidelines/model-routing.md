@@ -213,6 +213,8 @@ Do not:
 
 Use [`templates/model-routing-decision.md`](../templates/model-routing-decision.md) when routing decisions need to be visible or measured.
 
+For a controlled comparison of a fixed approved model, task-aware routing and bounded fallback, use the [model-routing benchmark protocol](../benchmarks/model-routing-fallback.md). It measures all attempts against identical task, quality, budget and data-boundary criteria; it does not supply measured results.
+
 ## Upstream Inspiration And Attribution
 
 The budget/quota, fallback, caching, and observability additions were informed by the cost-aware gateway patterns documented by [BunsDev/omniroute](https://github.com/BunsDev/omniroute), reviewed 2026-09-19. This playbook keeps those ideas vendor-neutral and does not embed OmniRoute's provider pricing, quota tables, or marketing claims as durable facts.
