@@ -21,6 +21,37 @@ For each meaningful AI-assisted task, record the fields that are available witho
 
 Do not invent missing telemetry. Use `unknown` or leave a field blank and document the limitation.
 
+## Separate Model Identity, Hosting And Measurement Basis
+
+Keep the model developer/family, hosting platform and actual deployment route distinguishable. One family served directly and through a cloud platform is not two independent model families, but its routes can have different billing and approved data boundaries. Preserve requested identifiers and the model/route actually resolved after fallback. Normalise aliases only with a dated mapping to verified versions; an unfamiliar alias stays unresolved rather than being guessed into a family.
+
+Use the existing measurement CSV's `route_id` and `run_id` to reference a versioned side record for hosting platform, model family/version, route resolution and observation coverage. Define what the existing `provider` field means for the dataset and keep that interpretation stable. Do not put credentials, account secrets or private endpoint URLs into public records, or change the established CSV columns to capture one report.
+
+### Counts And Denominators
+
+Before comparing routes or publishing a share, record the window, eligible cohort, metric unit, aggregation/weighting method, missing coverage and deduplication rule.
+
+- Distinguish logical tasks, model-request attempts, tool/MCP operations and agent handoffs. A retry is another attempt, not another successful task; a tool call does not automatically have model-token usage.
+- Count a model attempt once even when the client, gateway and provider all log it. Keep model-family and hosting-platform totals as alternate views of those same attempts, not totals to add together.
+- Request share, input-token share and output-token share use different denominators. Retain failed attempts and known billable usage; missing usage stays unknown rather than zero. Report denominators based only on measured records as such.
+- Record whether results pool requests or weight organisations/projects equally. Label top-N-only, sampled, filtered and observed-gateway subsets; do not describe them as the whole estate or market.
+- Keep cache-token semantics and billing basis explicit. Do not add cached tokens again when already included in input totals; a higher raw-token share is not automatically a higher billed-cost share.
+- Separate deployment/alias counts from verified distinct models. Traffic concentration alone does not establish task complexity, model quality, causal business value or governance coverage.
+
+For a non-zero denominator, each share is `route's measured quantity / total measured quantity on the same basis`. A zero denominator makes the share undefined. Unknown coverage must remain visible even when known shares sum to 100%.
+
+### Fictional Accounting Example
+
+These invented values illustrate arithmetic only; they are not benchmark results or facts from the source report. Assume all model attempts and their token counts are observed in one window. Both routes serve the same verified fictional model family, with different hosting paths.
+
+| Route | Hosting path | Attempts | Input tokens | Output tokens |
+| --- | --- | --- | --- | --- |
+| A | Direct | 10 | 90,000 | 2,000 |
+| B | Cloud-hosted | 90 | 10,000 | 18,000 |
+| Total | Both paths | 100 | 100,000 | 20,000 |
+
+A accounts for 10% of attempts, 90% of input tokens and 10% of output tokens; B accounts for 90%, 10% and 90%, respectively. The family roll-up covers both paths once. None of these figures identifies the cheaper, safer or more accurate route without billing, task and verification evidence.
+
 ## Attribute Cost To Outcomes
 
 Raw token totals are useful but incomplete. Prefer outcome-oriented measures such as:
@@ -140,3 +171,5 @@ Leave unavailable fields blank or mark them `unknown`; do not fabricate provider
 ## Upstream Inspiration
 
 [CodeBurn](https://github.com/getagentseal/codeburn) is one useful example of local-first, cross-tool usage attribution. Its project/model/task breakdowns, cache-aware accounting, retry-tax analysis, and routing-waste concepts informed this guide. This playbook does not depend on CodeBurn, copy its implementation, or adopt its pricing or savings claims as universal facts.
+
+The separate identity and denominator views are informed by Kong's *The State of AI Governance*, supplied 18-page edition, pp. 7–10, reviewed 2026-10-05. Those pages distinguish model-family traffic, hosting routes, request counts and input/output token volume. A related [publisher article](https://konghq.com/blog/enterprise/enterprise-ai-governance) provides public context. The recording rules and fictional example above are original local guidance, not reproduced measurements. The report's customer-cohort shares and inferred workload explanations are not adopted as universal market shares, model-quality evidence or causal conclusions. No PDF text or artwork is reproduced. Source PDF SHA-256: `43867bd6a6b0e83dc4bbfdc0969d49352be53e59f48a1d69205b917e402d1417`.

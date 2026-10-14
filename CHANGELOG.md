@@ -8,6 +8,7 @@ This project follows a lightweight, documentation-first changelog. Versions are 
 
 ### Added
 
+- Model-family versus hosting-route attribution, explicit usage denominators and observation limits, with a fictional checked example in the canonical token-observability guide.
 - Optional cache-aware resource-discovery comparison covering stable selected tool sets, schema freshness, authorization and complete cache-cost accounting; protocol only, with no measured savings claim.
 - Optional whole-runtime resource and background-helper accounting for multi-agent benchmarks, separating comparable memory/CPU measurements from model costs and verified outcomes.
 
