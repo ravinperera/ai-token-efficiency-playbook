@@ -40,6 +40,29 @@ Use commit SHAs, branch names, issue IDs, artifact paths, or other immutable/pin
 
 Do not rely on vague pointers such as `latest`, `current changes`, or `the previous output` when the workflow can identify an exact revision.
 
+## Revalidate Mutable State Before Writing
+
+A stable reference is excellent evidence, but a mutable branch or worktree can change after an agent reads it. When another agent, automation, or human may touch the same file, treat the earlier read as potentially stale before writing.
+
+Use a small freshness check:
+
+```text
+record path + read revision
+-> prepare the smallest intended change
+-> re-read or compare the contested path/ref immediately before write
+-> apply only if the expected base still matches
+-> otherwise reconcile or stop with an explicit conflict
+```
+
+- Capture the file path and revision, blob identity, or equivalent state that was actually read.
+- For mutable refs, confirm the current file still matches the expected base before replacing it. Do not assume an unchanged branch name means unchanged content.
+- If another change landed, rebase the intended edit onto the fresh state or narrow the patch to the non-conflicting lines. Do not overwrite the newer work wholesale just because the older full-file content is still in context.
+- Keep immutable refs for evidence and review, while resolving the latest approved mutable state when the task requires a new write.
+- If automated compare-and-swap or optimistic concurrency is available, use it. A failed precondition is a coordination signal, not permission to force the write.
+- When intent conflicts rather than text alone, stop and surface the conflict to the owner or coordinator instead of guessing which change should win.
+
+This guard can spend a small extra read to avoid expensive rework, lost edits, or invalid verification. Measure the trade-off at workflow level rather than treating every avoided read as a token saving.
+
 ## Keep Notifications Small
 
 A notification should normally say that work is ready and where the authoritative state lives. It should not duplicate the entire task description, diff, logs, and prior discussion if those are already stored durably.
