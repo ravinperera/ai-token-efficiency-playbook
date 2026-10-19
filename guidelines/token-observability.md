@@ -67,15 +67,40 @@ routing waste
 
 A run that uses fewer tokens but fails verification is not an efficiency win.
 
-### Retry tax
+### Verified outcomes and incomplete tasks
 
-Treat repeated failed or abandoned attempts as a separate cost component.
+Define the task cohort, observation cutoff, cost view and verification criteria before comparing results. Give each logical task one outcome at that cutoff: verified success, failed, cancelled/policy-stopped, or pending/unknown. A safe policy stop can be a successful safety decision without completing the requested task; report both dimensions. Do not relabel a pending check as either verified success or failure.
 
 ```text
-retry tax = cost of attempts before the final successful attempt
+cost per verified task = total cost of all tasks in the declared cohort / verified task count
 ```
 
-The exact formula can be adapted to the telemetry available. Keep the definition stable within a benchmark so runs remain comparable.
+Include known costs from failed, cancelled and pending tasks, plus retries and helpers, once in the numerator. Averaging only the costs of successful tasks answers a different question and must be labelled as survivor-only. With zero verified tasks the ratio is undefined, not zero. When costs or outcomes are incomplete, label the observation provisional, report known cost and missing coverage, and do not present it as a complete-cohort efficiency result. Keep the same cohort when later outcomes arrive; do not silently drop unfinished tasks.
+
+### Retry tax
+
+For a task that reaches verified success, use the following definition:
+
+```text
+pre-success retry tax = cost of unsuccessful attempts before the accepted successful attempt
+```
+
+Record the cost of tasks that never reached verified success separately; there is no final successful attempt from which to calculate their pre-success retry tax. In `retry_tax_cost`, leave that value blank with a not-applicable explanation in `notes` or a linked side record. Reserve zero for a measured zero, such as first-attempt success; missing attempt costs remain unknown. Do not change the CSV schema to encode the distinction.
+
+Both pre-success retry tax and never-successful task cost are breakdowns of the cohort total, not additional costs to add on top. They are accounting categories, not proof that research, a rejected design or a safe stop had no value. Any alternative retry metric must have an explicit, stable definition rather than silently mixing these categories.
+
+### Fictional mixed-outcome example
+
+These invented USD amounts illustrate complete accounting, not measured model prices or performance. Assume all task costs, including any helpers and verification, are captured in the listed attempts at the same cutoff.
+
+| Task | Attempt costs (USD) | Outcome | Total (USD) |
+| --- | --- | --- | --- |
+| A | 0.20 failed + 0.30 successful | Verified success | 0.50 |
+| B | 0.15 failed + 0.25 failed | Failed | 0.40 |
+| C | 0.10 before a policy stop | Stopped, not task-complete | 0.10 |
+| Total | Five attempts | One verified task | 1.00 |
+
+Cost per verified task is USD 1.00 / 1 = USD 1.00, not the survivor-only USD 0.50. A's pre-success retry tax is USD 0.20; B and C contribute USD 0.50 of never-successful task cost. These reconcile with A's successful attempt: 0.20 + 0.50 + 0.30 = USD 1.00. If A's verification is still pending, the verified count is zero and the provisional ratio is undefined. This example adds no new claim to the upstream sources below.
 
 ### Routing waste
 
