@@ -8,6 +8,7 @@ This project follows a lightweight, documentation-first changelog. Versions are 
 
 ### Added
 
+- Complete-cohort outcome-cost and retry-tax guidance for failed, stopped and pending tasks, with an arithmetic-checked fictional example and explicit zero-success handling.
 - Stale-read invalidation guidance for multi-agent writes, including pre-write freshness checks, reconciliation and explicit conflict handling.
 - Model-family versus hosting-route attribution, explicit usage denominators and observation limits, with a fictional checked example in the canonical token-observability guide.
 - Optional cache-aware resource-discovery comparison covering stable selected tool sets, schema freshness, authorization and complete cache-cost accounting; protocol only, with no measured savings claim.
