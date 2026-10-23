@@ -12,6 +12,7 @@ from urllib.parse import unquote, urlsplit
 EXCLUDED_PARTS = {".git", ".venv", "node_modules", "__pycache__"}
 INLINE_LINK_RE = re.compile(r"!?\[[^\]]*\]\(([^)\n]+)\)")
 REFERENCE_LINK_RE = re.compile(r"^\s*\[[^\]]+\]:\s*(\S+)", re.MULTILINE)
+FENCE_RE = re.compile(r"^ {0,3}(`{3,}|~{3,})(.*)$")
 EXTERNAL_PREFIXES = (
     "http://",
     "https://",
@@ -36,30 +37,41 @@ def markdown_files(root: Path) -> list[Path]:
     return files
 
 
-def strip_fenced_blocks(text: str) -> str:
-    """Replace fenced-code content with blank lines while preserving line numbers."""
-    result: list[str] = []
+def scan_markdown(text: str) -> tuple[str, list[str]]:
+    """Mask fenced code and check formatting in a single length-aware pass."""
+    searchable_lines: list[str] = []
+    errors: list[str] = []
     active_fence: str | None = None
-    for line in text.splitlines(keepends=True):
-        stripped = line.lstrip()
-        marker = None
-        if stripped.startswith("```"):
-            marker = "```"
-        elif stripped.startswith("~~~"):
-            marker = "~~~"
+    active_line = 0
 
-        if marker is not None:
-            if active_fence is None:
-                active_fence = marker
-            elif active_fence == marker:
-                active_fence = None
-            result.append("\n" if line.endswith("\n") else "")
-        elif active_fence is None:
-            result.append(line)
+    for line_number, line in enumerate(text.splitlines(keepends=True), start=1):
+        raw_line = line.rstrip("\r\n")
+        match = FENCE_RE.match(raw_line)
+        if active_fence is None:
+            if match and (match.group(1)[0] != "`" or "`" not in match.group(2)):
+                active_fence = match.group(1)
+                active_line = line_number
+                searchable_lines.append("\n" if line.endswith("\n") else "")
+                continue
+            if raw_line.rstrip(" \t") != raw_line:
+                errors.append(f"line {line_number}: trailing whitespace")
+            searchable_lines.append(line)
         else:
-            result.append("\n" if line.endswith("\n") else "")
-    return "".join(result)
+            if (
+                match
+                and match.group(1)[0] == active_fence[0]
+                and len(match.group(1)) >= len(active_fence)
+                and not match.group(2).strip()
+            ):
+                active_fence = None
+                active_line = 0
+            searchable_lines.append("\n" if line.endswith("\n") else "")
 
+    if active_fence is not None:
+        errors.append(
+            f"line {active_line}: unclosed Markdown fence starting with {active_fence}"
+        )
+    return "".join(searchable_lines), errors
 
 def destination_path(raw_destination: str) -> str | None:
     """Extract a local path from a Markdown link destination."""
@@ -117,34 +129,8 @@ def validate_markdown(root: Path, path: Path) -> list[str]:
     if "\x00" in text:
         errors.append("contains a NUL byte")
 
-    active_fence: str | None = None
-    active_line = 0
-    for line_number, line in enumerate(text.splitlines(), start=1):
-        stripped = line.lstrip()
-        marker = None
-        if stripped.startswith("```"):
-            marker = "```"
-        elif stripped.startswith("~~~"):
-            marker = "~~~"
-
-        if marker is not None:
-            if active_fence is None:
-                active_fence = marker
-                active_line = line_number
-            elif active_fence == marker:
-                active_fence = None
-                active_line = 0
-            continue
-
-        if active_fence is None and line.rstrip(" \t") != line:
-            errors.append(f"line {line_number}: trailing whitespace")
-
-    if active_fence is not None:
-        errors.append(
-            f"line {active_line}: unclosed Markdown fence starting with {active_fence}"
-        )
-
-    searchable_text = strip_fenced_blocks(text)
+    searchable_text, formatting_errors = scan_markdown(text)
+    errors.extend(formatting_errors)
     destinations = [
         match.group(1) for match in INLINE_LINK_RE.finditer(searchable_text)
     ]
