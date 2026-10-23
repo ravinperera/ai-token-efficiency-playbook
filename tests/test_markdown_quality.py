@@ -76,5 +76,65 @@ class MarkdownQualityTests(unittest.TestCase):
             self.assertIn("link escapes the repository", errors[0])
 
 
+    def _errors_for(self, markdown: str) -> list[str]:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            readme = root / "README.md"
+            readme.write_text(markdown, encoding="utf-8")
+            return MODULE.validate_markdown(root, readme)
+
+    def test_long_backtick_fence_protects_shorter_nested_examples(self) -> None:
+        markdown = (
+            "````markdown\n"
+            "```python\n"
+            "[Inside](missing-inside.md)  \n"
+            "```\n"
+            "````\n"
+            "[Outside](missing-outside.md)\n"
+        )
+        self.assertEqual(
+            ["missing local link target: missing-outside.md"],
+            self._errors_for(markdown),
+        )
+
+    def test_tilde_fence_ignores_shorter_and_mixed_markers(self) -> None:
+        markdown = (
+            "~~~~markdown\n"
+            "~~~\n"
+            "````\n"
+            "[Inside](missing-inside.md)\n"
+            "~~~~~\n"
+            "[Valid](README.md)\n"
+        )
+        self.assertEqual([], self._errors_for(markdown))
+
+    def test_closing_fence_cannot_have_info_text(self) -> None:
+        markdown = (
+            "```text\n"
+            "```not-a-closer\n"
+            "[Inside](missing-inside.md)\n"
+            "```\n"
+        )
+        self.assertEqual([], self._errors_for(markdown))
+
+    def test_shorter_closing_fence_leaves_outer_fence_unclosed(self) -> None:
+        markdown = (
+            "````markdown\n"
+            "```\n"
+            "[Inside](missing-inside.md)\n"
+        )
+        self.assertEqual(
+            ["line 1: unclosed Markdown fence starting with ````"],
+            self._errors_for(markdown),
+        )
+
+    def test_four_space_indented_ticks_do_not_start_fence(self) -> None:
+        markdown = "    ```\n[Outside](missing.md)\n"
+        self.assertEqual(
+            ["missing local link target: missing.md"],
+            self._errors_for(markdown),
+        )
+
+
 if __name__ == "__main__":
     unittest.main()
