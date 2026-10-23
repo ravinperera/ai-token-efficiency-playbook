@@ -73,6 +73,7 @@ def scan_markdown(text: str) -> tuple[str, list[str]]:
         )
     return "".join(searchable_lines), errors
 
+
 def destination_path(raw_destination: str) -> str | None:
     """Extract a local path from a Markdown link destination."""
     destination = raw_destination.strip()
