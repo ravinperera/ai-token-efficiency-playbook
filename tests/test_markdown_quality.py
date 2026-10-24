@@ -135,7 +135,6 @@ class MarkdownQualityTests(unittest.TestCase):
             self._errors_for(markdown),
         )
 
-
     def test_inline_code_links_are_ignored_but_real_links_are_checked(self) -> None:
         markdown = (
             "`[example](missing-inline.md)`\n"
@@ -164,7 +163,7 @@ class MarkdownQualityTests(unittest.TestCase):
 
     def test_escaped_and_unclosed_ticks_do_not_hide_real_links(self) -> None:
         markdown = (
-            r"\\`[first](missing-first.md)\\`" + "\n"
+            r"\`[first](missing-first.md)\`" + "\n"
             + "`unclosed [second](missing-second.md)\n"
         )
         self.assertEqual(
