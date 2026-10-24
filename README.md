@@ -46,65 +46,21 @@ For what is validated by this repository versus what still requires live client 
 
 ## What This Provides
 
-Ready-to-copy instruction files and supporting material:
+The five installable agent instruction adapters are listed in the table above. The canonical guidance lives in [`guidelines/`](guidelines/); the links below are **curated starting points**, not a complete or automatically maintained file inventory.
 
-```text
-.
-├── AGENTS.md
-├── CLAUDE.md
-├── GEMINI.md
-├── .github/
-│   └── copilot-instructions.md
-├── .cursor/
-│   └── rules/
-│       └── token-efficiency.mdc
-├── prompts/
-│   ├── tokensaver-mode.md
-│   ├── debugging-mode.md
-│   ├── code-review-mode.md
-│   └── architecture-mode.md
-├── guidelines/
-│   ├── token-saving-principles.md
-│   ├── minimum-necessary-implementation.md
-│   ├── coding-agent-guidelines.md
-│   ├── context-hygiene.md
-│   ├── progressive-context-retrieval.md
-│   ├── cli-output-compression.md
-│   ├── document-to-markdown.md
-│   ├── model-routing.md
-│   ├── per-tool-notes.md
-│   └── anti-patterns.md
-├── examples/
-│   ├── before-after-prompts.md
-│   ├── bad-vs-good-context.md
-│   ├── case-study-ci-log-triage.md
-│   └── image-vs-markdown-context.md
-├── benchmarks/
-│   ├── evaluation-corpus.md
-│   ├── document-conversion-measurement.md
-│   ├── dynamic-resource-discovery.md
-│   ├── multi-agent-orchestration-cost.md
-│   └── structural-memory-retrieval.md
-├── scripts/
-│   ├── check-token-hygiene.sh
-│   ├── estimate-context-size.py
-│   └── install.sh
-├── tests/
-│   ├── test_check_token_hygiene.sh
-│   ├── test_estimate_context_size.py
-│   └── test_install.sh
-├── templates/
-│   ├── ci-failure-triage.md
-│   ├── document-context-extraction.md
-│   ├── handoff-template.md
-│   ├── model-routing-decision.md
-│   ├── resource-discovery-measurement.csv
-│   └── token-savings-measurement.md
-└── checklists/
-    └── token-efficiency-checklist.md
-```
+| Task | Canonical guidance | Reproducible record or comparison |
+| --- | --- | --- |
+| Reduce unnecessary context and code | [Token-saving principles](guidelines/token-saving-principles.md) and [minimum-necessary implementation](guidelines/minimum-necessary-implementation.md) | [Implementation benchmark](benchmarks/minimum-necessary-implementation.md) and [measurement CSV](templates/minimum-necessary-implementation-measurement.csv) |
+| Route models within approved cost, quota and data boundaries | [Model routing](guidelines/model-routing.md) | [Routing/fallback benchmark](benchmarks/model-routing-fallback.md) and [decision template](templates/model-routing-decision.md) |
+| Retrieve targeted code and structural context | [Progressive context retrieval](guidelines/progressive-context-retrieval.md) | [Structural-memory benchmark](benchmarks/structural-memory-retrieval.md) and [retrieval receipt](templates/context-retrieval-receipt.md) |
+| Compress context without losing authoritative evidence | [Reversible context compression](guidelines/reversible-context-compression.md) | [Compression benchmark](benchmarks/reversible-context-compression.md) and [compression receipt](templates/context-compression-receipt.md) |
+| Load only the skills and tools needed | [Selective skill loading](guidelines/selective-skill-loading.md) | [Resource-discovery benchmark](benchmarks/dynamic-resource-discovery.md) and [skill manifest](templates/agent-skill-manifest.md) |
+| Coordinate agents and capture full orchestration cost | [Multi-agent context efficiency](guidelines/multi-agent-context-efficiency.md) | [Orchestration benchmark](benchmarks/multi-agent-orchestration-cost.md) and [measurement CSV](templates/multi-agent-orchestration-measurement.csv) |
+| Explain tokens, retries, cache use and actual versus estimated cost | [Token observability](guidelines/token-observability.md) | [Attribution CSV](templates/token-observability-measurement.csv) |
+| Select relevant material from documents and images | [Document-to-Markdown guidance](guidelines/document-to-markdown.md) | [Document conversion benchmark](benchmarks/document-conversion-measurement.md) and [extraction template](templates/document-context-extraction.md) |
+| Check repository quality and adapter limitations | [Token-efficiency checklist](checklists/token-efficiency-checklist.md) and [adapter verification matrix](docs/adapter-compatibility.md) | [Helper tests](tests/), [local scripts](scripts/) and [benchmark run manifest](templates/benchmark-run-manifest.md) |
 
-See [`CHANGELOG.md`](CHANGELOG.md) for the lightweight version history and release notes.
+The benchmarks are protocols and fixtures, **not verified live model savings**. See [`CHANGELOG.md`](CHANGELOG.md) for changes and [`docs/external-pattern-intake.md`](docs/external-pattern-intake.md) for the source-attribution approach.
 
 ## The Standard
 
