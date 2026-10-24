@@ -74,6 +74,41 @@ def scan_markdown(text: str) -> tuple[str, list[str]]:
     return "".join(searchable_lines), errors
 
 
+def mask_inline_code(text: str) -> str:
+    """Hide complete backtick code spans from link checks, preserving newlines."""
+
+    def is_unescaped(position: int) -> bool:
+        backslashes = 0
+        position -= 1
+        while position >= 0 and text[position] == "\\":
+            backslashes += 1
+            position -= 1
+        return backslashes % 2 == 0
+
+    runs = [
+        match
+        for match in re.finditer(r"`+", text)
+        if is_unescaped(match.start())
+    ]
+    searchable = list(text)
+    index = 0
+    while index < len(runs):
+        closing = index + 1
+        while (
+            closing < len(runs)
+            and len(runs[closing].group()) != len(runs[index].group())
+        ):
+            closing += 1
+        if closing == len(runs):
+            index += 1
+            continue
+        for position in range(runs[index].start(), runs[closing].end()):
+            if text[position] not in "\r\n":
+                searchable[position] = " "
+        index = closing + 1
+    return "".join(searchable)
+
+
 def destination_path(raw_destination: str) -> str | None:
     """Extract a local path from a Markdown link destination."""
     destination = raw_destination.strip()
@@ -132,6 +167,7 @@ def validate_markdown(root: Path, path: Path) -> list[str]:
 
     searchable_text, formatting_errors = scan_markdown(text)
     errors.extend(formatting_errors)
+    searchable_text = mask_inline_code(searchable_text)
     destinations = [
         match.group(1) for match in INLINE_LINK_RE.finditer(searchable_text)
     ]
