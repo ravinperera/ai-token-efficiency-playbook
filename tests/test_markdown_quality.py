@@ -136,5 +136,45 @@ class MarkdownQualityTests(unittest.TestCase):
         )
 
 
+    def test_inline_code_links_are_ignored_but_real_links_are_checked(self) -> None:
+        markdown = (
+            "`[example](missing-inline.md)`\n"
+            "[real](missing-real.md)\n"
+        )
+        self.assertEqual(
+            ["missing local link target: missing-real.md"],
+            self._errors_for(markdown),
+        )
+
+    def test_multi_backtick_spans_can_contain_single_backticks(self) -> None:
+        markdown = (
+            "`` `[example](missing-inline.md)` ``\n"
+            "[real](README.md)\n"
+        )
+        self.assertEqual([], self._errors_for(markdown))
+
+    def test_multiline_inline_code_may_contain_reference_definitions(self) -> None:
+        markdown = (
+            "``\n"
+            "[sample]: missing-reference.md\n"
+            "``\n"
+            "[real](README.md)\n"
+        )
+        self.assertEqual([], self._errors_for(markdown))
+
+    def test_escaped_and_unclosed_ticks_do_not_hide_real_links(self) -> None:
+        markdown = (
+            r"\\`[first](missing-first.md)\\`" + "\n"
+            + "`unclosed [second](missing-second.md)\n"
+        )
+        self.assertEqual(
+            [
+                "missing local link target: missing-first.md",
+                "missing local link target: missing-second.md",
+            ],
+            self._errors_for(markdown),
+        )
+
+
 if __name__ == "__main__":
     unittest.main()
