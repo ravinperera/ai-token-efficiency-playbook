@@ -10,7 +10,7 @@ from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
 EXCLUDED_PARTS = {".git", ".venv", "node_modules", "__pycache__"}
-INLINE_LINK_RE = re.compile(r"!?\[[^\]]*\]\(([^)\n]+)\)")
+INLINE_LINK_START_RE = re.compile(r"!?\[[^\]\n]*\]\(")
 REFERENCE_LINK_RE = re.compile(r"^\s*\[[^\]]+\]:\s*(\S+)", re.MULTILINE)
 FENCE_RE = re.compile(r"^ {0,3}(`{3,}|~{3,})(.*)$")
 EXTERNAL_PREFIXES = (
@@ -109,6 +109,30 @@ def mask_inline_code(text: str) -> str:
     return "".join(searchable)
 
 
+def inline_link_destinations(text: str) -> list[str]:
+    """Read Markdown link targets without truncating balanced parentheses."""
+    destinations: list[str] = []
+    for opening in INLINE_LINK_START_RE.finditer(text):
+        depth = 1
+        escaped = False
+        for position in range(opening.end(), len(text)):
+            character = text[position]
+            if character in "\r\n":
+                break
+            if escaped:
+                escaped = False
+            elif character == "\\":
+                escaped = True
+            elif character == "(":
+                depth += 1
+            elif character == ")":
+                depth -= 1
+                if depth == 0:
+                    destinations.append(text[opening.end() : position])
+                    break
+    return destinations
+
+
 def destination_path(raw_destination: str) -> str | None:
     """Extract a local path from a Markdown link destination."""
     destination = raw_destination.strip()
@@ -126,7 +150,7 @@ def destination_path(raw_destination: str) -> str | None:
     parsed = urlsplit(destination)
     if parsed.scheme:
         return None
-    return unquote(parsed.path)
+    return re.sub(r"\\([()])", r"\1", unquote(parsed.path))
 
 
 def validate_local_link(
@@ -168,9 +192,7 @@ def validate_markdown(root: Path, path: Path) -> list[str]:
     searchable_text, formatting_errors = scan_markdown(text)
     errors.extend(formatting_errors)
     searchable_text = mask_inline_code(searchable_text)
-    destinations = [
-        match.group(1) for match in INLINE_LINK_RE.finditer(searchable_text)
-    ]
+    destinations = inline_link_destinations(searchable_text)
     destinations.extend(
         match.group(1) for match in REFERENCE_LINK_RE.finditer(searchable_text)
     )

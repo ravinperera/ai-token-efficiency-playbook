@@ -175,5 +175,52 @@ class MarkdownQualityTests(unittest.TestCase):
         )
 
 
+    def test_balanced_parentheses_in_local_link_pass(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "docs").mkdir()
+            (root / "docs" / "guide(v2).md").write_text(
+                "# Guide\n", encoding="utf-8"
+            )
+            readme = root / "README.md"
+            readme.write_text(
+                "[Guide](docs/guide(v2).md)\n", encoding="utf-8"
+            )
+            self.assertEqual([], MODULE.validate_markdown(root, readme))
+
+    def test_escaped_parentheses_and_image_title_pass(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "docs").mkdir()
+            (root / "docs" / "diagram(v2).png").write_bytes(b"example")
+            readme = root / "README.md"
+            readme.write_text(
+                r'![Diagram](docs/diagram\(v2\).png "Diagram (v2)")' + "\n",
+                encoding="utf-8",
+            )
+            self.assertEqual([], MODULE.validate_markdown(root, readme))
+
+    def test_angle_bracket_local_link_with_spaces_and_parentheses_passes(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "docs").mkdir()
+            (root / "docs" / "Q4 (final).md").write_text(
+                "# Report\n", encoding="utf-8"
+            )
+            readme = root / "README.md"
+            readme.write_text(
+                "[Report](<docs/Q4 (final).md>)\n", encoding="utf-8"
+            )
+            self.assertEqual([], MODULE.validate_markdown(root, readme))
+
+    def test_missing_parenthesised_target_is_still_reported(self) -> None:
+        errors = self._errors_for(
+            "[Missing](docs/never(v3).md)\n"
+            "[Web](https://example.com/a(b))\n"
+        )
+        self.assertEqual(
+            ["missing local link target: docs/never(v3).md"], errors
+        )
+
 if __name__ == "__main__":
     unittest.main()
