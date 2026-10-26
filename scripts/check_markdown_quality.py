@@ -74,21 +74,22 @@ def scan_markdown(text: str) -> tuple[str, list[str]]:
     return "".join(searchable_lines), errors
 
 
+def is_unescaped(text: str, position: int) -> bool:
+    """Whether a character is preceded by an even number of backslashes."""
+    backslashes = 0
+    position -= 1
+    while position >= 0 and text[position] == "\\":
+        backslashes += 1
+        position -= 1
+    return backslashes % 2 == 0
+
+
 def mask_inline_code(text: str) -> str:
     """Hide complete backtick code spans from link checks, preserving newlines."""
-
-    def is_unescaped(position: int) -> bool:
-        backslashes = 0
-        position -= 1
-        while position >= 0 and text[position] == "\\":
-            backslashes += 1
-            position -= 1
-        return backslashes % 2 == 0
-
     runs = [
         match
         for match in re.finditer(r"`+", text)
-        if is_unescaped(match.start())
+        if is_unescaped(text, match.start())
     ]
     searchable = list(text)
     index = 0
@@ -113,6 +114,11 @@ def inline_link_destinations(text: str) -> list[str]:
     """Read Markdown link targets without truncating balanced parentheses."""
     destinations: list[str] = []
     for opening in INLINE_LINK_START_RE.finditer(text):
+        bracket_position = opening.start() + (
+            1 if opening.group().startswith("!") else 0
+        )
+        if not is_unescaped(text, bracket_position):
+            continue
         depth = 1
         escaped = False
         for position in range(opening.end(), len(text)):
