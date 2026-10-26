@@ -222,5 +222,28 @@ class MarkdownQualityTests(unittest.TestCase):
             ["missing local link target: docs/never(v3).md"], errors
         )
 
+    def test_escaped_markdown_openers_are_literal_text(self) -> None:
+        markdown = (
+            r"\[literal](missing-one.md)" + "\n"
+            + r"\\\[literal](missing-three.md)" + "\n"
+            + r"!\[literal image](missing-image.png)" + "\n"
+            + "[real](README.md)\n"
+        )
+        self.assertEqual([], self._errors_for(markdown))
+
+    def test_even_backslashes_preserve_genuine_markdown_links(self) -> None:
+        markdown = (
+            r"\\[real](missing-real.md)" + "\n"
+            + "![image](missing-image.png)\n"
+        )
+        self.assertEqual(
+            [
+                "missing local link target: missing-real.md",
+                "missing local link target: missing-image.png",
+            ],
+            self._errors_for(markdown),
+        )
+
+
 if __name__ == "__main__":
     unittest.main()
