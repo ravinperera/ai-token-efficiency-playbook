@@ -52,6 +52,30 @@ warm index: valid index already exists for the pinned revision
 
 Do not present a warm-query result as the total cost of first use. Likewise, do not charge every later query the full historical indexing cost unless that reflects the real deployment model.
 
+## Index Lifecycle And Workload Break-Even
+
+A fast warm query does not establish that a persistent index pays for itself. For a reuse claim, **freeze a complete workload** before measuring: task IDs and acceptance criteria, the ordered sequence of repository revisions, expected index invalidations, the number of queries, and an observation cutoff. Run the same tasks against search/range retrieval without carrying answers or agent state between modes.
+
+Track the index lifecycle separately from query performance:
+
+- Record initial build, incremental refresh, forced rebuild, failed build, and stale-index detection events, including the source revision, event identifier, time, and any known model/tool cost. Count each event once even when several tasks share it.
+- For each task, record cold/warm index state, query time, fallback source reads, verification, retries, and the outcome. Keep failed, cancelled, and pending tasks in the declared workload instead of reporting only successful warm queries.
+- Run a revision-change scenario that invalidates a relevant relationship and observe whether the index refreshes or safely falls back. A cheaper but incorrect stale-index answer is not a passing result.
+- Distinguish first-use, steady-state, and mixed-change workloads. Report observed event frequency; do not assume one build remains valid forever or that every query incurs a full rebuild.
+
+Compare **complete workload totals** at equivalent task correctness and safety:
+
+```text
+indexed total = build + refresh/rebuild + queries + fallback reads + verification + retries
+search total  = discovery/search + source reads + verification + retries
+```
+
+Use the same unit for each term (such as elapsed seconds or a consistently priced cost view). Do not add token counts to elapsed time, double-count cached input, or describe measured query-only tokens as end-to-end cost. For a simplified fixed-cost model with positive per-task savings, the illustrative break-even task count is `(build + refresh cost) / (search cost per task - indexed query cost per task)`. If per-task savings are zero or negative, that expression has no positive break-even; if refresh frequency rises with task count, use the observed workload totals instead.
+
+**Fictional arithmetic only, not measured results:** a 20-minute build, one 4-minute refresh, and four tasks taking 8 minutes each with search versus 3 minutes each with indexed queries yield 32 minutes for search and 36 for indexed retrieval. For eight tasks under the *same single-refresh assumption*, totals become 64 versus 48 minutes. Neither result is generalizable without matched quality, revision, caching, and real telemetry.
+
+Use one row per task in the existing [structural retrieval measurement CSV](../templates/structural-memory-retrieval-measurement.csv). Record build/refresh time on the run that incurred it (zero only for a measured zero; otherwise `unknown`) and use `notes` plus a linked [benchmark run manifest](../templates/benchmark-run-manifest.md) to identify any shared, pre-task setup event. Keep unallocated setup cost visible in the workload total rather than inventing per-task usage; disclose incomplete cost coverage. Report cold-query, warm-query, and full-workload findings separately.
+
 ## Relationship Provenance Test
 
 When a structural system mixes deterministic parsing with semantic/model-derived relationships, test provenance quality separately from graph-query speed.
