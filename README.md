@@ -20,16 +20,27 @@ This is a conceptual overview, not an implemented runtime or a measured savings 
 
 ## 30-Second Install
 
-Run the installer from the root of the repository that should receive the instruction file. Replace `codex` with `claude`, `gemini`, `copilot`, or `cursor` as needed.
+**Review-first install (recommended):** From the root of the repository that should receive the instruction file, fetch the playbook into a separate directory. Record its exact commit and inspect the installer **and** the instruction adapter you plan to install (`AGENTS.md` for `codex`):
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/ravinperera/ai-token-efficiency-playbook/main/scripts/install.sh | sh -s -- codex
+PLAYBOOK_DIR="$(mktemp -d)"
+git clone --depth 1 https://github.com/ravinperera/ai-token-efficiency-playbook.git "$PLAYBOOK_DIR"
+git -C "$PLAYBOOK_DIR" rev-parse HEAD
+cat "$PLAYBOOK_DIR/scripts/install.sh" "$PLAYBOOK_DIR/AGENTS.md"
 ```
 
-The installer maps each tool to its canonical file and **refuses to overwrite an existing file**. Review an existing instruction file first; use `--force` only when replacement is intentional.
+**Only after reviewing and approving those files**, run this from the target repository in the **same shell session**:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/ravinperera/ai-token-efficiency-playbook/main/scripts/install.sh | sh -s -- --force codex
+TOKEN_EFFICIENCY_SOURCE_ROOT="$PLAYBOOK_DIR" sh "$PLAYBOOK_DIR/scripts/install.sh" codex
+```
+
+Replace `codex` with `claude`, `gemini`, `copilot`, or `cursor`, and inspect that tool's adapter file from the table below instead. The local source-root option copies from the **same reviewed checkout**, without fetching a second adapter from mutable `main`. The displayed commit identifies what was reviewed; for repeatable deployments, check out a previously approved tag or full commit SHA **before** inspecting and installing, rather than relying on a fresh `main` checkout. An installation script or agent instruction file is still untrusted until its actual contents and intended use have been reviewed.
+
+The installer **refuses to overwrite an existing file**. If replacement is intentional, first review and back up the existing instruction file, then explicitly choose `--force` with the same reviewed source:
+
+```bash
+TOKEN_EFFICIENCY_SOURCE_ROOT="$PLAYBOOK_DIR" sh "$PLAYBOOK_DIR/scripts/install.sh" --force codex
 ```
 
 | Tool | Installed file |
