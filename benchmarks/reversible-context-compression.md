@@ -57,6 +57,18 @@ Create a compressed representation that:
 
 Record every retrieval call and the amount of source material reintroduced.
 
+## Guard Negative Controls (Synthetic Fixtures)
+
+Run the following checks **separately from the three-arm task comparison**, using synthetic or otherwise authorised evidence. They test whether a compression implementation enforces the guard rules; they are not measurements of model savings. Keep the task, source revision, required-evidence set, and permitted actions fixed.
+
+| Injected condition | Expected guard behaviour | Evidence to retain |
+| --- | --- | --- |
+| Candidate transform has **more tokens** than the original under the same tokenizer | Keep the original active representation; do not report a compression saving | Original/candidate token counts, tokenizer, final representation, transformation cost |
+| Candidate omits a protected recent requirement or changes an exact decision-critical value | Reject the transform, preserve the authoritative evidence, and require verification before proceeding | Must-retain comparison, rejection reason, any safe original-source fallback |
+| Candidate points to a missing, stale, wrong-project, or access-revoked source | Do not trust the compact reference; recheck freshness and authorisation, then use an accessible original or stop | Source revision/boundary, retrieval outcome, fallback/stop result |
+
+Do not silently skip a failed guard trial. A **safe fallback is a successful guard decision**, not evidence of context or billable-cost savings. If the required original is inaccessible, stopping with an explicit evidence gap is preferable to generating an unverified answer. Count failed or discarded compression attempts, guard checks, and retrieval attempts in the total cost and latency for the trial; compare accepted compressions separately from rejected or stopped trials. Do not treat absent token or cache telemetry as a zero cost.
+
 ## Measurements
 
 Capture at least:
@@ -69,6 +81,9 @@ Capture at least:
 | Output tokens | | | |
 | Retrieval/tool-call count | | | |
 | Reintroduced source tokens | | | |
+| Candidate/source tokens and guard verdict (Arm C) | N/A | N/A | |
+| Original-source resolution and permission outcome | N/A | N/A | |
+| Discarded transform and failed retrieval overhead | N/A | N/A | |
 | Compression latency | | | |
 | Retrieval latency | | | |
 | Total wall-clock latency | | | |
