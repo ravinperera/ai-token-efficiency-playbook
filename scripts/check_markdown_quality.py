@@ -11,7 +11,9 @@ from urllib.parse import unquote, urlsplit
 
 EXCLUDED_PARTS = {".git", ".venv", "node_modules", "__pycache__"}
 INLINE_LINK_START_RE = re.compile(r"!?\[[^\]\n]*\]\(")
-REFERENCE_LINK_RE = re.compile(r"^\s*\[[^\]]+\]:\s*(\S+)", re.MULTILINE)
+REFERENCE_LINK_RE = re.compile(
+    r"^ {0,3}\[[^\]\n]+\]:\s*(<[^>\n]+>|[^\s<>]+)", re.MULTILINE
+)
 FENCE_RE = re.compile(r"^ {0,3}(`{3,}|~{3,})(.*)$")
 EXTERNAL_PREFIXES = (
     "http://",
