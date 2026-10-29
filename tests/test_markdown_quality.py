@@ -175,6 +175,42 @@ class MarkdownQualityTests(unittest.TestCase):
         )
 
 
+
+    def test_reference_angle_destination_with_spaces_passes(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "docs").mkdir()
+            (root / "docs" / "Release Notes.md").write_text(
+                "# Notes\n", encoding="utf-8"
+            )
+            readme = root / "README.md"
+            readme.write_text(
+                '[notes]: <docs/Release Notes.md> "Release notes"\n'
+                '[Notes][notes]\n',
+                encoding="utf-8",
+            )
+            self.assertEqual([], MODULE.validate_markdown(root, readme))
+
+    def test_reference_missing_spaced_destination_reports_full_path(self) -> None:
+        self.assertEqual(
+            ["missing local link target: <docs/Missing Notes.md>"],
+            self._errors_for("[notes]: <docs/Missing Notes.md>\n"),
+        )
+
+    def test_four_space_indented_reference_is_code_not_link(self) -> None:
+        self.assertEqual(
+            ["missing local link target: missing-real.md"],
+            self._errors_for(
+                "    [code]: missing-code.md\n"
+                "[real]: missing-real.md\n"
+            ),
+        )
+
+    def test_reference_destination_on_following_line_is_supported(self) -> None:
+        self.assertEqual(
+            [], self._errors_for("[notes]:\n<README.md>\n")
+        )
+
     def test_balanced_parentheses_in_local_link_pass(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
