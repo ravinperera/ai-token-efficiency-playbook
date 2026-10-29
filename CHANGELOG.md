@@ -14,6 +14,10 @@ This project follows a lightweight, documentation-first changelog. Versions are 
 - Optional cache-aware resource-discovery comparison covering stable selected tool sets, schema freshness, authorization and complete cache-cost accounting; protocol only, with no measured savings claim.
 - Optional whole-runtime resource and background-helper accounting for multi-agent benchmarks, separating comparable memory/CPU measurements from model costs and verified outcomes.
 
+### Changed
+
+- Markdown reference-link validation now recognises angle-bracket paths containing spaces and ignores reference-shaped text indented as code.
+
 ## [0.1.0] - 2026-10-01
 
 First tagged public release. The July baseline below records earlier development, not a previously published GitHub release.
