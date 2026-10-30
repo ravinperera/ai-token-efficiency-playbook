@@ -8,6 +8,7 @@ This project follows a lightweight, documentation-first changelog. Versions are 
 
 ### Added
 
+- Defined distinct cache-token-share and cache-eligible request-hit denominators, with coverage safeguards and a fictional checked example.
 - Complete-cohort outcome-cost and retry-tax guidance for failed, stopped and pending tasks, with an arithmetic-checked fictional example and explicit zero-success handling.
 - Stale-read invalidation guidance for multi-agent writes, including pre-write freshness checks, reconciliation and explicit conflict handling.
 - Model-family versus hosting-route attribution, explicit usage denominators and observation limits, with a fictional checked example in the canonical token-observability guide.

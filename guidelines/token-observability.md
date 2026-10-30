@@ -125,6 +125,21 @@ A change that slightly increases raw input tokens can still reduce cost if it im
 
 Measure both token volume and billed cost rather than treating either one as a universal proxy for the other.
 
+### Define Cache-Reuse Denominators
+
+The term `cache-hit ratio` is ambiguous. Name the unit, eligible cohort, observation window, provider counter semantics, and missing coverage before publishing a percentage. Two different useful measures are:
+
+- **Cached-input-token share:** `sum(observed reused/cached input tokens) / sum(observed input tokens)` for the same deduplicated attempts, **only when** the provider's input total already includes cached input. If it reports uncached and cached input as separate non-overlapping components, use their sum as the denominator instead. Cache writes are not reuse and do not belong in the numerator.
+- **Eligible-request cache-hit rate:** `number of observed cache-eligible model attempts with >0 reused input tokens / number of observed cache-eligible model attempts`. Define eligibility using the provider's documented cache mechanism, including any minimum prefix or retention rules. A cache write or an attempted cache lookup alone is not a hit.
+
+Count each submitted model attempt once, including failed attempts and retries with measured usage. A task may have multiple attempts; a tool call without model usage is not an automatic cache miss. When eligibility cannot be determined, report **observed reuse among telemetry-complete attempts** under that narrower label, not an eligible-request hit rate. Do not equate an unavailable cached-token counter with a measured zero.
+
+For either metric, a zero denominator makes the result **undefined**. Publish the count of included attempts and the number excluded due to missing/incompatible counters or unknown eligibility. Do not pool providers or model routes with incompatible definitions until counts are normalised and their measurement coverage is disclosed.
+
+**Fictional example (not measured performance):** Suppose two eligible attempts have complete, comparable counters. Attempt A has 1,000 total input tokens, 800 of them reused; B has 500 input tokens, none reused. The cached-input-token share is `800 / 1,500 = 53.3%`, while the eligible-request hit rate is `1 / 2 = 50%`. Neither percentage by itself proves a billed saving: actual cost also depends on uncached tokens, cache writes, output, pricing, any priming overhead and verification outcomes.
+
+The existing [measurement CSV](../templates/token-observability-measurement.csv) carries input/cache token fields. Record cache eligibility, provider counter interpretation, unknown coverage and receipt/deduplication rules in its `notes` field or a versioned side record rather than silently changing the CSV schema.
+
 ## Subscription And API Cost Are Different Views
 
 A coding assistant subscription, enterprise licence, bundled allowance, and pay-as-you-go API can represent the same model usage very differently.
