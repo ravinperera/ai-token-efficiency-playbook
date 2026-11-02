@@ -152,6 +152,22 @@ Record which cost view is being used:
 
 Never present an API-equivalent estimate as actual cash saved on a fixed subscription. If price tables are used, record their source and effective date because model pricing changes.
 
+### Reconcile fixed fees, attribution and overages
+
+A fixed licence payment is normally incurred whether an individual recorded task runs or not. Choose and publish the allocation method **before** comparing tasks or teams: for example, assigned seat-months, named projects, or a documented weighting of observed eligible tasks. Record the billing window, currency, eligible seats/tasks, utilisation coverage, allocation weights, invoice reference and owner in an approved side record; the task CSV's existing `notes`, `run_id`, `cost_view` and `allocated_subscription_cost` can refer to it. Do not store employee identities or confidential invoices in a public dataset.
+
+Keep three non-additive views distinct:
+
+- **Fixed subscription ledger:** reconcile licence charges once to the actual invoice. Allocate costs among declared projects/tasks and retain an explicit **idle, unassigned or unobserved** bucket. Missing task telemetry is not a zero-cost task, and token share is not necessarily a fair allocation basis.
+- **Direct billed-usage ledger:** record separately charged API usage and overages once, using invoice/provider receipts and a deduplication key. An overage already included in a bundled plan must not be charged a second time. If the marginal charge is unknown, record unknown rather than zero.
+- **API-equivalent comparison:** estimate the same observed usage under a clearly dated alternative price schedule, separately from both cash ledgers. This is a counterfactual, **not** an invoice line or realised saving.
+
+When allocating a particular seat's fixed fee across eligible observed tasks, one illustrative policy is `task allocation = seat fee × task weight / sum(weights for that seat and period)`. Publish the weights and unallocated share. If observation coverage is incomplete, report the allocation as provisional instead of distributing all fees over the visible subset as if it were complete. Reconcile fixed allocations **including the idle/unattributed bucket** to the fixed-fee total, and reconcile direct billed events to incremental billed charges; never add the allocated fixed fees to the same fixed invoice total again.
+
+**Fictional arithmetic example (not measured use or actual vendor pricing):** Two seats cost GBP 30 each for one month (GBP 60 fixed). All three eligible tasks on the first seat are observed and weighted equally: two tasks belong to project A and one to B. Allocate GBP 20 to A and GBP 10 to B; the unused second seat stays in a GBP 30 idle/unattributed bucket. Thus `20 + 10 + 30 = 60`. Suppose an independently billed API overage of GBP 5 is also verified: the invoice total is `60 + 5 = GBP 65`. An unrelated API-equivalent estimate of GBP 18 for the observed tasks **does not** change either the GBP 60 fixed fee or the GBP 65 bill. The fixed allocation plus the distinct GBP 5 overage reconciles to GBP 65, but those allocations must not be added to the invoice a second time.
+
+Report **incremental cash savings** from a subscription optimisation only when a real invoice charge changes, such as an approved seat reduction or avoided overage; lower token usage or estimated API-equivalent cost alone does not demonstrate that. When comparing subscription and API routing, include any migration, quota, coverage, verification and operational overhead before concluding that one option is cheaper.
+
 ## Prefer Local Or Privacy-Preserving Collection
 
 Usage analytics should not create a new sensitive-data pipeline merely to reduce AI cost.
