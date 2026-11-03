@@ -38,6 +38,19 @@ python3 scripts/estimate-context-size.py before.md after.md --fail-on-missing
 
 Without `--fail-on-missing`, the helper keeps its interactive-friendly behaviour: missing paths are warned about and skipped.
 
+When measuring a directory, the helper recursively skips generated or dependency
+directories named `.git`, `.venv`, `venv`, `node_modules`, `__pycache__`,
+or `.pytest_cache` at any depth. This keeps the default estimate focused on
+the selected source context rather than installed dependencies or caches.
+The exclusion applies only while walking a containing directory: pass a
+specific file or subdirectory explicitly if it is genuinely part of your
+context. For example:
+
+```bash
+python3 scripts/estimate-context-size.py node_modules/selected-example.js
+```
+
+
 ## How to use the numbers
 
 Use the same files, tool, and measurement method before and after the change. Record the result in [`templates/token-savings-measurement.md`](../templates/token-savings-measurement.md).

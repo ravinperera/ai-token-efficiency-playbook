@@ -33,6 +33,52 @@ class EstimateContextSizeTests(unittest.TestCase):
             files = list(estimator.iter_files([str(root)]))
             self.assertEqual(files, [root / "b.txt", root / "nested" / "a.txt"])
 
+    def test_recursive_scan_prunes_generated_trees_but_keeps_source_files(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = root / "source.md"
+            similar_name = root / "node_modules.txt"
+            source.write_text("real context", encoding="utf-8")
+            similar_name.write_text("also context", encoding="utf-8")
+
+            for name in (".git", ".venv", "venv", "node_modules", "__pycache__", ".pytest_cache"):
+                artifact = root / name / "nested" / "generated.txt"
+                artifact.parent.mkdir(parents=True)
+                artifact.write_text("not context", encoding="utf-8")
+
+            nested_artifact = root / "src" / "node_modules" / "generated.js"
+            nested_artifact.parent.mkdir(parents=True)
+            nested_artifact.write_text("not context", encoding="utf-8")
+
+            self.assertEqual(
+                list(estimator.iter_files([str(root)])),
+                sorted([source, similar_name]),
+            )
+
+    def test_explicit_generated_paths_are_included_and_deduplicated(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = root / "source.md"
+            source.write_text("context", encoding="utf-8")
+            generated_dir = root / "node_modules"
+            generated_dir.mkdir()
+            generated = generated_dir / "package.js"
+            generated.write_text("explicit input", encoding="utf-8")
+
+            self.assertEqual(
+                list(estimator.iter_files([str(root), str(generated), str(generated_dir)])),
+                [source, generated],
+            )
+
+    def test_excluded_ancestor_name_does_not_skip_explicit_directory(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            repo = Path(directory) / ".venv" / "project"
+            repo.mkdir(parents=True)
+            document = repo / "README.md"
+            document.write_text("include me", encoding="utf-8")
+
+            self.assertEqual(list(estimator.iter_files([str(repo)])), [document])
+
     def test_read_text_preserves_unicode_and_replaces_invalid_utf8(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

@@ -14,18 +14,35 @@ import sys
 from typing import Iterable
 
 
+EXCLUDED_RECURSIVE_DIRS = frozenset(
+    {".git", ".venv", "venv", "node_modules", "__pycache__", ".pytest_cache"}
+)
+
+
+def iter_directory_files(directory: Path) -> Iterable[Path]:
+    """Walk selected inputs in sorted order, pruning generated subdirectories."""
+    for child in sorted(directory.iterdir()):
+        if child.name in EXCLUDED_RECURSIVE_DIRS:
+            continue
+        if child.is_dir():
+            # Like pathlib.rglob(), do not follow directory symlinks.
+            if not child.is_symlink():
+                yield from iter_directory_files(child)
+        elif child.is_file():
+            yield child
+
+
 def iter_files(paths: Iterable[str]) -> Iterable[Path]:
     seen: set[Path] = set()
     for raw_path in paths:
         path = Path(raw_path)
         if path.is_dir():
-            for child in sorted(path.rglob("*")):
-                if child.is_file() and ".git" not in child.parts:
-                    canonical = child.resolve()
-                    if canonical in seen:
-                        continue
-                    seen.add(canonical)
-                    yield child
+            for child in iter_directory_files(path):
+                canonical = child.resolve()
+                if canonical in seen:
+                    continue
+                seen.add(canonical)
+                yield child
         elif path.is_file():
             canonical = path.resolve()
             if canonical in seen:
