@@ -30,13 +30,13 @@ Generate a Markdown table for a case study:
 python3 scripts/estimate-context-size.py before.md after.md --markdown
 ```
 
-For CI or repeatable benchmarks, fail rather than silently measuring a partial input set when a requested path is missing:
+For CI or repeatable benchmarks, require every requested input path to exist **and** at least one file to be selected after recursive exclusions:
 
 ```bash
-python3 scripts/estimate-context-size.py before.md after.md --fail-on-missing
+python3 scripts/estimate-context-size.py before.md after.md --fail-on-missing --fail-on-empty
 ```
 
-Without `--fail-on-missing`, the helper keeps its interactive-friendly behaviour: missing paths are warned about and skipped.
+`--fail-on-missing` rejects nonexistent input paths. Separately, `--fail-on-empty` rejects a selection containing **no files** (for example, an empty directory or one containing only pruned dependency trees), with exit code 2 and no misleading zero-total output. A zero-byte file is still a valid, measured file and succeeds. Neither flag changes the default interactive behaviour: absent paths are warned about and skipped, and an empty selection prints a zero total.
 
 When measuring a directory, the helper recursively skips generated or dependency
 directories named `.git`, `.venv`, `venv`, `node_modules`, `__pycache__`,

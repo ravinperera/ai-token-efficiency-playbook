@@ -78,6 +78,11 @@ def main() -> int:
         action="store_true",
         help="Return a non-zero exit code if any explicitly requested input path is missing",
     )
+    parser.add_argument(
+        "--fail-on-empty",
+        action="store_true",
+        help="Return a non-zero exit code when no files are selected for estimation",
+    )
     args = parser.parse_args()
 
     if args.fail_on_missing:
@@ -103,6 +108,10 @@ def main() -> int:
         totals[2] += word_count
         totals[3] += line_count
         totals[4] += token_estimate
+
+    if args.fail_on_empty and not rows:
+        print("error: no files selected for estimation", file=sys.stderr)
+        return 2
 
     if args.markdown:
         print("| Path | Bytes | Characters | Words | Lines | Est. tokens |")
