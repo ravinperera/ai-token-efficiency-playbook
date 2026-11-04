@@ -163,5 +163,71 @@ class EstimateContextSizeTests(unittest.TestCase):
         self.assertNotIn("total:", result.stdout)
 
 
+    def test_fail_on_empty_rejects_empty_directory(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            result = subprocess.run(
+                [sys.executable, str(SCRIPT_PATH), directory, "--fail-on-empty"],
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+
+            self.assertEqual(result.returncode, 2)
+            self.assertIn("error: no files selected for estimation", result.stderr)
+            self.assertNotIn("total:", result.stdout)
+
+    def test_fail_on_empty_rejects_fully_pruned_directory(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            generated = root / "node_modules" / "nested" / "generated.js"
+            generated.parent.mkdir(parents=True)
+            generated.write_text("generated content", encoding="utf-8")
+
+            result = subprocess.run(
+                [sys.executable, str(SCRIPT_PATH), directory,
+                 "--fail-on-missing", "--fail-on-empty"],
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+
+            self.assertEqual(result.returncode, 2)
+            self.assertIn("error: no files selected for estimation", result.stderr)
+            self.assertNotIn("total:", result.stdout)
+
+    def test_fail_on_empty_allows_explicit_zero_byte_file(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "empty.md"
+            source.write_text("", encoding="utf-8")
+            result = subprocess.run(
+                [sys.executable, str(SCRIPT_PATH), str(source),
+                 "--fail-on-missing", "--fail-on-empty"],
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn(
+                "total: bytes=0 chars=0 words=0 lines=0 est_tokens=0",
+                result.stdout,
+            )
+
+    def test_empty_directory_without_flag_retains_zero_total(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            result = subprocess.run(
+                [sys.executable, str(SCRIPT_PATH), directory],
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn(
+                "total: bytes=0 chars=0 words=0 lines=0 est_tokens=0",
+                result.stdout,
+            )
+
+
 if __name__ == "__main__":
     unittest.main()
