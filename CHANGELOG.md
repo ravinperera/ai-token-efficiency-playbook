@@ -17,6 +17,7 @@ This project follows a lightweight, documentation-first changelog. Versions are 
 
 ### Changed
 
+- Context-size estimator Markdown output now keeps paths containing pipes and backticks within one table cell.
 - Markdown reference-link validation now recognises angle-bracket paths containing spaces and ignores reference-shaped text indented as code.
 
 ## [0.1.0] - 2026-10-01

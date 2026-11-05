@@ -114,6 +114,38 @@ class EstimateContextSizeTests(unittest.TestCase):
             self.assertIn("| **Total** | 15 | 14 | 3 | 2 | 4 |", result.stdout)
             self.assertIn("est_tokens is approximate", result.stdout)
 
+    def test_markdown_table_handles_pipes_and_backticks_in_paths(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            with_pipe = root / "context|part.md"
+            with_tick = root / "context`part.md"
+            with_both = root / "context``part|two.md"
+            for path in (with_pipe, with_tick, with_both):
+                path.write_text("one\n", encoding="utf-8")
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(SCRIPT_PATH),
+                    str(with_pipe),
+                    str(with_tick),
+                    str(with_both),
+                    "--markdown",
+                ],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+
+            lines = result.stdout.splitlines()
+            self.assertIn("| `" + str(with_pipe).replace("|", r"\|") + "` |", lines[2])
+            self.assertIn("| `` " + str(with_tick) + " `` |", lines[3])
+            self.assertIn("| ``` " + str(with_both).replace("|", r"\|") + " ``` |", lines[4])
+            for row in lines[2:5]:
+                # Six columns require seven unescaped table separators.
+                self.assertEqual(row.count("|") - row.count(r"\|"), 7)
+            self.assertIn("| **Total** | 12 | 12 | 3 | 3 | 3 |", result.stdout)
+
     def test_cli_reports_original_byte_size_for_invalid_utf8(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "invalid.bin"
