@@ -9,6 +9,7 @@ context size consistently without claiming exact billing numbers.
 from __future__ import annotations
 
 import argparse
+import re
 from pathlib import Path
 import sys
 from typing import Iterable
@@ -61,6 +62,17 @@ def estimate_tokens(text: str) -> int:
     # A conservative, dependency-free approximation commonly used for English text.
     # Real token counts vary by model, language, formatting, and tokenizer.
     return max(1, round(len(text) / 4)) if text else 0
+
+
+def markdown_code_path(path: str) -> str:
+    """Render a path as one Markdown table cell, including special filenames."""
+    longest_run = max((len(run) for run in re.findall(r"`+", path)), default=0)
+    fence = "`" * (longest_run + 1)
+    escaped = path.replace("|", r"\|")
+    # Code-span content touching a backtick delimiter needs space padding.
+    if "`" in path:
+        escaped = f" {escaped} "
+    return f"{fence}{escaped}{fence}"
 
 
 def main() -> int:
@@ -117,7 +129,7 @@ def main() -> int:
         print("| Path | Bytes | Characters | Words | Lines | Est. tokens |")
         print("| --- | ---: | ---: | ---: | ---: | ---: |")
         for row in rows:
-            print(f"| `{row[0]}` | {row[1]} | {row[2]} | {row[3]} | {row[4]} | {row[5]} |")
+            print(f"| {markdown_code_path(row[0])} | {row[1]} | {row[2]} | {row[3]} | {row[4]} | {row[5]} |")
         print(f"| **Total** | {totals[0]} | {totals[1]} | {totals[2]} | {totals[3]} | {totals[4]} |")
     else:
         for row in rows:
