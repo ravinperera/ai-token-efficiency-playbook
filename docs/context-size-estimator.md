@@ -51,6 +51,28 @@ python3 scripts/estimate-context-size.py node_modules/selected-example.js
 ```
 
 
+## When an encoding-specific token count is required
+
+The estimator above is intentionally approximate. For a tokenizer-specific
+count, use the separate `scripts/count-tokens.py` helper with `tiktoken`
+installed and an explicitly selected encoding:
+
+```bash
+python3 scripts/count-tokens.py before.md --encoding cl100k_base --require-tiktoken
+```
+
+With `--require-tiktoken`, an unavailable tokenizer returns exit code 2 and
+no count instead of silently falling back to an approximation. The default
+helper behaviour is unchanged and reports `approximation` when falling back;
+`--approx-only` remains available for repeatable rough comparisons. The two
+counting modes are mutually exclusive.
+
+Even a tokenizer-exact count applies only to the specified encoding. It is
+**not** automatically the billed token count for a model, client, tool calls,
+caching, or provider-specific handling. For cost claims, prefer recorded
+provider usage and a dated pricing basis in the
+[benchmark run manifest](../templates/benchmark-run-manifest.md).
+
 ## How to use the numbers
 
 Use the same files, tool, and measurement method before and after the change. Record the result in [`templates/token-savings-measurement.md`](../templates/token-savings-measurement.md).
