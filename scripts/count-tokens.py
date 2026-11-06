@@ -44,17 +44,29 @@ def main() -> int:
         default="cl100k_base",
         help="tiktoken encoding to use when tiktoken is installed. Default: cl100k_base",
     )
-    parser.add_argument(
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument(
         "--approx-only",
         action="store_true",
         help="Skip tiktoken and use the deterministic approximation.",
+    )
+    mode.add_argument(
+        "--require-tiktoken",
+        action="store_true",
+        help="Fail instead of approximating when tiktoken is unavailable.",
     )
     args = parser.parse_args()
 
     text = read_input(args.path)
     count = None if args.approx_only else tiktoken_count(text, args.encoding)
-    method = "tiktoken" if count is not None else "approximation"
+    if count is None and args.require_tiktoken:
+        print(
+            "error: tiktoken unavailable; install it or omit --require-tiktoken",
+            file=sys.stderr,
+        )
+        return 2
 
+    method = "tiktoken" if count is not None else "approximation"
     if count is None:
         count = approximate_tokens(text)
 
