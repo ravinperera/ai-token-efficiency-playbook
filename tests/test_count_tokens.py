@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 import importlib.util
+import io
 import subprocess
 import sys
 import tempfile
 import unittest
+from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
+from unittest.mock import patch
 
 SCRIPT_PATH = Path(__file__).parents[1] / "scripts" / "count-tokens.py"
 SPEC = importlib.util.spec_from_file_location("count_tokens", SCRIPT_PATH)
@@ -48,6 +51,55 @@ class CountTokensTests(unittest.TestCase):
         )
 
         self.assertEqual(result.stdout.strip(), "2\tapproximation\tstdin")
+
+    def test_require_tiktoken_fails_without_fallback(self) -> None:
+        output, errors = io.StringIO(), io.StringIO()
+        with (
+            patch.object(counter, "tiktoken_count", return_value=None),
+            patch.object(sys, "argv", ["count-tokens.py", "--require-tiktoken"]),
+            patch.object(sys, "stdin", io.StringIO("hello")),
+            redirect_stdout(output),
+            redirect_stderr(errors),
+        ):
+            code = counter.main()
+
+        self.assertEqual(code, 2)
+        self.assertEqual(output.getvalue(), "")
+        self.assertIn("error: tiktoken unavailable", errors.getvalue())
+
+    def test_require_tiktoken_emits_exact_count_when_available(self) -> None:
+        output, errors = io.StringIO(), io.StringIO()
+        with (
+            patch.object(counter, "tiktoken_count", return_value=7) as tokenizer,
+            patch.object(sys, "argv", ["count-tokens.py", "--require-tiktoken"]),
+            patch.object(sys, "stdin", io.StringIO("sample")),
+            redirect_stdout(output),
+            redirect_stderr(errors),
+        ):
+            code = counter.main()
+
+        self.assertEqual(code, 0)
+        tokenizer.assert_called_once_with("sample", "cl100k_base")
+        self.assertEqual(output.getvalue().strip(), "7\ttiktoken\tstdin")
+        self.assertEqual(errors.getvalue(), "")
+
+    def test_conflicting_counting_modes_fail(self) -> None:
+        result = subprocess.run(
+            [
+                sys.executable,
+                str(SCRIPT_PATH),
+                "--require-tiktoken",
+                "--approx-only",
+            ],
+            input="hello",
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("not allowed with argument", result.stderr)
+        self.assertEqual(result.stdout, "")
 
 
 if __name__ == "__main__":
