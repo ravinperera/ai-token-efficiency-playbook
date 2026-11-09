@@ -44,7 +44,11 @@ or `.pytest_cache` at any depth. This keeps the default estimate focused on
 the selected source context rather than installed dependencies or caches.
 The exclusion applies only while walking a containing directory: pass a
 specific file or subdirectory explicitly if it is genuinely part of your
-context. For example:
+context. Recursive scans also skip symlinked **files**, including links to
+files outside the selected directory, to avoid implicitly measuring unintended
+sources. An explicitly named file symlink is still included, so review its
+target first. This is a selection safeguard, not a substitute for data
+classification or access controls. For example:
 
 ```bash
 python3 scripts/estimate-context-size.py node_modules/selected-example.js

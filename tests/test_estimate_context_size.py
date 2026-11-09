@@ -55,6 +55,45 @@ class EstimateContextSizeTests(unittest.TestCase):
                 sorted([source, similar_name]),
             )
 
+    def test_recursive_scan_skips_file_symlinks_inside_and_outside_tree(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            base = Path(directory)
+            selected = base / "selected"
+            selected.mkdir()
+            source = selected / "source.md"
+            source.write_text("selected context", encoding="utf-8")
+            outside = base / "private.md"
+            outside.write_text("unselected context", encoding="utf-8")
+            internal_link = selected / "internal-link.md"
+            external_link = selected / "external-link.md"
+            try:
+                internal_link.symlink_to(source)
+                external_link.symlink_to(outside)
+            except (OSError, NotImplementedError) as exc:
+                self.skipTest(f"File symlinks are unavailable: {exc}")
+
+            self.assertEqual(list(estimator.iter_files([str(selected)])), [source])
+
+    def test_explicit_file_symlink_is_included_after_directory_scan(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            base = Path(directory)
+            selected = base / "selected"
+            selected.mkdir()
+            source = selected / "source.md"
+            source.write_text("selected context", encoding="utf-8")
+            outside = base / "separate.md"
+            outside.write_text("explicit context", encoding="utf-8")
+            link = selected / "selected-link.md"
+            try:
+                link.symlink_to(outside)
+            except (OSError, NotImplementedError) as exc:
+                self.skipTest(f"File symlinks are unavailable: {exc}")
+
+            self.assertEqual(
+                list(estimator.iter_files([str(selected), str(link)])),
+                [source, link],
+            )
+
     def test_explicit_generated_paths_are_included_and_deduplicated(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
