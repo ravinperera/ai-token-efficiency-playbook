@@ -83,6 +83,44 @@ class CountTokensTests(unittest.TestCase):
         self.assertEqual(output.getvalue().strip(), "7\ttiktoken\tstdin")
         self.assertEqual(errors.getvalue(), "")
 
+    def test_missing_or_directory_input_fails_without_count(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            for path, error_type in (
+                (Path(directory) / "missing.md", "FileNotFoundError"),
+                (Path(directory), "IsADirectoryError"),
+            ):
+                with self.subTest(path=path):
+                    result = subprocess.run(
+                        [sys.executable, str(SCRIPT_PATH), str(path), "--approx-only"],
+                        check=False,
+                        capture_output=True,
+                        text=True,
+                    )
+                    self.assertEqual(result.returncode, 2)
+                    self.assertEqual(result.stdout, "")
+                    self.assertEqual(
+                        result.stderr.strip(),
+                        f"error: cannot read input ({error_type})",
+                    )
+
+    def test_invalid_utf8_fails_without_echoing_input(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "invalid.txt"
+            path.write_bytes(b"sensitive-prefix\xff")
+            result = subprocess.run(
+                [sys.executable, str(SCRIPT_PATH), str(path), "--approx-only"],
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+            self.assertEqual(result.returncode, 2)
+            self.assertEqual(result.stdout, "")
+            self.assertEqual(
+                result.stderr.strip(),
+                "error: cannot read input (UnicodeDecodeError)",
+            )
+            self.assertNotIn("sensitive-prefix", result.stderr)
+
     def test_conflicting_counting_modes_fail(self) -> None:
         result = subprocess.run(
             [

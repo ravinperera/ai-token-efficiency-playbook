@@ -57,7 +57,13 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    text = read_input(args.path)
+    try:
+        text = read_input(args.path)
+    except (OSError, UnicodeError) as exc:
+        # Keep input bytes out of diagnostics, including UnicodeDecodeError text.
+        print(f"error: cannot read input ({type(exc).__name__})", file=sys.stderr)
+        return 2
+
     count = None if args.approx_only else tiktoken_count(text, args.encoding)
     if count is None and args.require_tiktoken:
         print(
