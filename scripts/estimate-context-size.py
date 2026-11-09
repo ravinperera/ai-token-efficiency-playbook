@@ -29,7 +29,8 @@ def iter_directory_files(directory: Path) -> Iterable[Path]:
             # Like pathlib.rglob(), do not follow directory symlinks.
             if not child.is_symlink():
                 yield from iter_directory_files(child)
-        elif child.is_file():
+        elif not child.is_symlink() and child.is_file():
+            # A directory scan should not read targets selected only via file symlinks.
             yield child
 
 
