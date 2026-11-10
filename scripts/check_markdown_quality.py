@@ -112,6 +112,16 @@ def mask_inline_code(text: str) -> str:
     return "".join(searchable)
 
 
+def mask_html_comments(text: str) -> str:
+    """Hide HTML comments from link discovery while retaining line boundaries."""
+    return re.sub(
+        r"<!--.*?(?:-->|\Z)",
+        lambda match: re.sub(r"[^\r\n]", " ", match.group()),
+        text,
+        flags=re.DOTALL,
+    )
+
+
 def inline_link_destinations(text: str) -> list[str]:
     """Read Markdown link targets without truncating balanced parentheses."""
     destinations: list[str] = []
@@ -199,7 +209,8 @@ def validate_markdown(root: Path, path: Path) -> list[str]:
 
     searchable_text, formatting_errors = scan_markdown(text)
     errors.extend(formatting_errors)
-    searchable_text = mask_inline_code(searchable_text)
+    # Mask inline code first so literal `<!--` cannot hide following real links.
+    searchable_text = mask_html_comments(mask_inline_code(searchable_text))
     destinations = inline_link_destinations(searchable_text)
     destinations.extend(
         match.group(1) for match in REFERENCE_LINK_RE.finditer(searchable_text)

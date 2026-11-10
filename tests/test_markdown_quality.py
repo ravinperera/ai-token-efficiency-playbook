@@ -176,6 +176,31 @@ class MarkdownQualityTests(unittest.TestCase):
 
 
 
+    def test_commented_out_links_do_not_trigger_missing_target_errors(self) -> None:
+        markdown = (
+            "[real](missing-real.md) <!-- [ignored](missing-inline.md) -->\n"
+            "<!--\n"
+            "[ignored](missing-multiline.md)\n"
+            "[reference]: missing-reference.md\n"
+            "-->\n"
+            "[valid](README.md)\n"
+        )
+        self.assertEqual(
+            ["missing local link target: missing-real.md"],
+            self._errors_for(markdown),
+        )
+
+    def test_unclosed_html_comment_hides_following_link_examples(self) -> None:
+        markdown = "[valid](README.md)\n<!-- [ignored](missing.md)\n[also]: missing.md\n"
+        self.assertEqual([], self._errors_for(markdown))
+
+    def test_html_comment_marker_in_code_cannot_hide_live_link(self) -> None:
+        markdown = "`<!--` [real](missing-real.md)\n"
+        self.assertEqual(
+            ["missing local link target: missing-real.md"],
+            self._errors_for(markdown),
+        )
+
     def test_reference_angle_destination_with_spaces_passes(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
