@@ -64,7 +64,15 @@ def main() -> int:
         print(f"error: cannot read input ({type(exc).__name__})", file=sys.stderr)
         return 2
 
-    count = None if args.approx_only else tiktoken_count(text, args.encoding)
+    try:
+        count = None if args.approx_only else tiktoken_count(text, args.encoding)
+    except (ValueError, LookupError, OSError) as exc:
+        # Fail closed rather than printing tokenizer internals or falling back.
+        print(
+            f"error: tokenizer failed ({type(exc).__name__}); check --encoding and local tokenizer resources",
+            file=sys.stderr,
+        )
+        return 2
     if count is None and args.require_tiktoken:
         print(
             "error: tiktoken unavailable; install it or omit --require-tiktoken",
