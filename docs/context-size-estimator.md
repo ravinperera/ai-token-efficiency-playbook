@@ -69,7 +69,7 @@ With `--require-tiktoken`, an unavailable tokenizer returns exit code 2 and
 no count instead of silently falling back to an approximation. The default
 helper behaviour is unchanged and reports `approximation` when falling back;
 `--approx-only` remains available for repeatable rough comparisons. The two
-counting modes are mutually exclusive. Missing files, unreadable inputs, and invalid UTF-8 also fail with exit code 2 rather than a traceback or partial token count. Diagnostics report the error type, not input bytes.
+counting modes are mutually exclusive. Missing files, unreadable inputs, and invalid UTF-8 also fail with exit code 2 rather than a traceback or partial token count. Diagnostics report the error type, not input bytes. If an installed tokenizer rejects the requested encoding or fails to load local tokenizer resources, the counter also exits with code 2 and no count. It does **not** silently switch to approximation after a tokenizer error; use `--approx-only` explicitly if a rough, non-billable comparison is appropriate.
 
 Even a tokenizer-exact count applies only to the specified encoding. It is
 **not** automatically the billed token count for a model, client, tool calls,
