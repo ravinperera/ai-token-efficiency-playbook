@@ -112,6 +112,16 @@ def mask_inline_code(text: str) -> str:
     return "".join(searchable)
 
 
+def mask_html_comments(text: str) -> str:
+    """Hide HTML comments from link discovery while retaining line boundaries."""
+    return re.sub(
+        r"<!--.*?(?:-->|\Z)",
+        lambda match: re.sub(r"[^\r\n]", " ", match.group()),
+        text,
+        flags=re.DOTALL,
+    )
+
+
 def inline_link_destinations(text: str) -> list[str]:
     """Read Markdown link targets without truncating balanced parentheses."""
     destinations: list[str] = []
