@@ -83,6 +83,43 @@ class CountTokensTests(unittest.TestCase):
         self.assertEqual(output.getvalue().strip(), "7\ttiktoken\tstdin")
         self.assertEqual(errors.getvalue(), "")
 
+    def test_invalid_tokenizer_encoding_fails_closed(self) -> None:
+        for options in ([], ["--require-tiktoken"]):
+            with self.subTest(options=options):
+                output, errors = io.StringIO(), io.StringIO()
+                with (
+                    patch.object(counter, "tiktoken_count", side_effect=ValueError("sensitive input")),
+                    patch.object(sys, "argv", ["count-tokens.py", "--encoding", "bad-alias", *options]),
+                    patch.object(sys, "stdin", io.StringIO("sensitive input")),
+                    redirect_stdout(output),
+                    redirect_stderr(errors),
+                ):
+                    code = counter.main()
+
+                self.assertEqual(code, 2)
+                self.assertEqual(output.getvalue(), "")
+                self.assertEqual(
+                    errors.getvalue().strip(),
+                    "error: tokenizer failed (ValueError); check --encoding and local tokenizer resources",
+                )
+                self.assertNotIn("sensitive input", errors.getvalue())
+
+    def test_tokenizer_resource_failure_does_not_fallback(self) -> None:
+        output, errors = io.StringIO(), io.StringIO()
+        with (
+            patch.object(counter, "tiktoken_count", side_effect=OSError("private cache path")),
+            patch.object(sys, "argv", ["count-tokens.py"]),
+            patch.object(sys, "stdin", io.StringIO("sample")),
+            redirect_stdout(output),
+            redirect_stderr(errors),
+        ):
+            code = counter.main()
+
+        self.assertEqual(code, 2)
+        self.assertEqual(output.getvalue(), "")
+        self.assertIn("error: tokenizer failed (OSError)", errors.getvalue())
+        self.assertNotIn("private cache path", errors.getvalue())
+
     def test_missing_or_directory_input_fails_without_count(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             for path, error_type in (
