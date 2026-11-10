@@ -209,7 +209,8 @@ def validate_markdown(root: Path, path: Path) -> list[str]:
 
     searchable_text, formatting_errors = scan_markdown(text)
     errors.extend(formatting_errors)
-    searchable_text = mask_inline_code(searchable_text)
+    # Mask inline code first so literal `<!--` cannot hide following real links.
+    searchable_text = mask_html_comments(mask_inline_code(searchable_text))
     destinations = inline_link_destinations(searchable_text)
     destinations.extend(
         match.group(1) for match in REFERENCE_LINK_RE.finditer(searchable_text)
