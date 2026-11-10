@@ -17,6 +17,7 @@ This project follows a lightweight, documentation-first changelog. Versions are 
 
 ### Changed
 
+- Markdown quality checks now ignore commented-out link examples while preserving validation of active links and inline-code boundaries.
 - Token counter now fails closed with concise diagnostics on invalid tokenizer encodings or local tokenizer resource errors, without returning approximate counts after tokenizer failure.
 - Token counter now fails cleanly on unreadable or invalid-UTF-8 input without printing source content or partial counts.
 - Context-size estimator Markdown output now keeps paths containing pipes and backticks within one table cell.
