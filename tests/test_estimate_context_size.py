@@ -185,6 +185,55 @@ class EstimateContextSizeTests(unittest.TestCase):
                 self.assertEqual(row.count("|") - row.count(r"\|"), 7)
             self.assertIn("| **Total** | 12 | 12 | 3 | 3 | 3 |", result.stdout)
 
+    def test_strict_utf8_rejects_corrupt_input_without_partial_measurements(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            good = root / "good.md"
+            bad = root / "bad.md"
+            good.write_text("good context\n", encoding="utf-8")
+            bad.write_bytes(b"private\xffpayload\n")
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(SCRIPT_PATH),
+                    str(good),
+                    str(bad),
+                    "--markdown",
+                    "--fail-on-invalid-utf8",
+                ],
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+
+            self.assertEqual(result.returncode, 2)
+            self.assertEqual(result.stdout, "")
+            self.assertIn("error: invalid UTF-8 input:", result.stderr)
+            self.assertIn(str(bad), result.stderr)
+            self.assertNotIn("private", result.stderr)
+            self.assertNotIn("Traceback", result.stderr)
+
+    def test_strict_utf8_accepts_valid_unicode(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "unicode.md"
+            path.write_text("café ☕\n", encoding="utf-8")
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(SCRIPT_PATH),
+                    str(path),
+                    "--fail-on-invalid-utf8",
+                ],
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn("total: bytes=10 chars=7", result.stdout)
+
     def test_cli_reports_original_byte_size_for_invalid_utf8(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "invalid.bin"

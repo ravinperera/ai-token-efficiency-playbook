@@ -55,8 +55,10 @@ def iter_files(paths: Iterable[str]) -> Iterable[Path]:
             print(f"warning: skipped missing path: {path}", file=sys.stderr)
 
 
-def read_text(path: Path) -> str:
-    return path.read_text(encoding="utf-8", errors="replace")
+def read_text(path: Path, *, strict_utf8: bool = False) -> str:
+    return path.read_text(
+        encoding="utf-8", errors="strict" if strict_utf8 else "replace"
+    )
 
 
 def estimate_tokens(text: str) -> int:
@@ -96,6 +98,11 @@ def main() -> int:
         action="store_true",
         help="Return a non-zero exit code when no files are selected for estimation",
     )
+    parser.add_argument(
+        "--fail-on-invalid-utf8",
+        action="store_true",
+        help="Fail instead of replacing invalid UTF-8 bytes in benchmark inputs",
+    )
     args = parser.parse_args()
 
     if args.fail_on_missing:
@@ -109,7 +116,11 @@ def main() -> int:
     totals = [0, 0, 0, 0, 0]
 
     for path in iter_files(args.paths):
-        text = read_text(path)
+        try:
+            text = read_text(path, strict_utf8=args.fail_on_invalid_utf8)
+        except UnicodeDecodeError:
+            print(f"error: invalid UTF-8 input: {path}", file=sys.stderr)
+            return 2
         byte_count = path.stat().st_size
         char_count = len(text)
         word_count = len(text.split())
