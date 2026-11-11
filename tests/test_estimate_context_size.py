@@ -190,8 +190,8 @@ class EstimateContextSizeTests(unittest.TestCase):
             root = Path(directory)
             good = root / "good.md"
             bad = root / "bad.md"
-            good.write_text("good context\\n", encoding="utf-8")
-            bad.write_bytes(b"private\\xffpayload\\n")
+            good.write_text("good context\n", encoding="utf-8")
+            bad.write_bytes(b"private\xffpayload\n")
 
             result = subprocess.run(
                 [
@@ -217,7 +217,7 @@ class EstimateContextSizeTests(unittest.TestCase):
     def test_strict_utf8_accepts_valid_unicode(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "unicode.md"
-            path.write_text("café ☕\\n", encoding="utf-8")
+            path.write_text("café ☕\n", encoding="utf-8")
 
             result = subprocess.run(
                 [
@@ -232,7 +232,7 @@ class EstimateContextSizeTests(unittest.TestCase):
             )
 
             self.assertEqual(result.returncode, 0, result.stderr)
-            self.assertIn("total: bytes=9 chars=7", result.stdout)
+            self.assertIn("total: bytes=10 chars=7", result.stdout)
 
     def test_cli_reports_original_byte_size_for_invalid_utf8(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
