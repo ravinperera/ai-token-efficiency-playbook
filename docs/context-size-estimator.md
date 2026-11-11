@@ -33,10 +33,12 @@ python3 scripts/estimate-context-size.py before.md after.md --markdown
 For CI or repeatable benchmarks, require every requested input path to exist **and** at least one file to be selected after recursive exclusions:
 
 ```bash
-python3 scripts/estimate-context-size.py before.md after.md --fail-on-missing --fail-on-empty
+python3 scripts/estimate-context-size.py before.md after.md --fail-on-missing --fail-on-empty --fail-on-invalid-utf8
 ```
 
 `--fail-on-missing` rejects nonexistent input paths. Separately, `--fail-on-empty` rejects a selection containing **no files** (for example, an empty directory or one containing only pruned dependency trees), with exit code 2 and no misleading zero-total output. A zero-byte file is still a valid, measured file and succeeds. Neither flag changes the default interactive behaviour: absent paths are warned about and skipped, and an empty selection prints a zero total.
+
+`--fail-on-invalid-utf8` also rejects selected files containing malformed UTF-8 (exit code 2, with no partial table or totals). The diagnostic identifies the file without echoing its bytes. By default, the helper still substitutes replacement characters for invalid input, which is convenient for exploratory scans but can distort character and approximate-token comparisons. Use the strict flag for reproducible text-only benchmarks; it does not make the estimates tokenizer-exact.
 
 When measuring a directory, the helper recursively skips generated or dependency
 directories named `.git`, `.venv`, `venv`, `node_modules`, `__pycache__`,
