@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 import importlib.util
+import io
 import subprocess
 import sys
 import tempfile
 import unittest
 from pathlib import Path
+from contextlib import redirect_stderr, redirect_stdout
+from unittest import mock
 
 SCRIPT_PATH = Path(__file__).parents[1] / "scripts" / "estimate-context-size.py"
 SPEC = importlib.util.spec_from_file_location("estimate_context_size", SCRIPT_PATH)
@@ -184,6 +187,59 @@ class EstimateContextSizeTests(unittest.TestCase):
                 # Six columns require seven unescaped table separators.
                 self.assertEqual(row.count("|") - row.count(r"\|"), 7)
             self.assertIn("| **Total** | 12 | 12 | 3 | 3 | 3 |", result.stdout)
+
+    def test_unreadable_selected_file_exits_cleanly_without_partial_output(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "input.md"
+            source.write_text("not to be echoed", encoding="utf-8")
+            output, diagnostics = io.StringIO(), io.StringIO()
+            with (
+                mock.patch.object(sys, "argv", ["estimate-context-size.py", str(source)]),
+                mock.patch.object(estimator, "read_text", side_effect=PermissionError("secret text")),
+                redirect_stdout(output),
+                redirect_stderr(diagnostics),
+            ):
+                status = estimator.main()
+
+            self.assertEqual(status, 2)
+            self.assertEqual(output.getvalue(), "")
+            self.assertIn("error: cannot read selected input:", diagnostics.getvalue())
+            self.assertNotIn("secret text", diagnostics.getvalue())
+            self.assertNotIn("Traceback", diagnostics.getvalue())
+
+    def test_directory_traversal_error_exits_cleanly(self) -> None:
+        output, diagnostics = io.StringIO(), io.StringIO()
+        with (
+            mock.patch.object(sys, "argv", ["estimate-context-size.py", "directory"]),
+            mock.patch.object(estimator, "iter_files", side_effect=PermissionError("private listing")),
+            redirect_stdout(output),
+            redirect_stderr(diagnostics),
+        ):
+            status = estimator.main()
+
+        self.assertEqual(status, 2)
+        self.assertEqual(output.getvalue(), "")
+        self.assertIn("error: cannot traverse selected input", diagnostics.getvalue())
+        self.assertNotIn("private listing", diagnostics.getvalue())
+
+    def test_stat_failure_after_read_exits_without_partial_output(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "input.md"
+            source.write_text("context", encoding="utf-8")
+            output, diagnostics = io.StringIO(), io.StringIO()
+            with (
+                mock.patch.object(sys, "argv", ["estimate-context-size.py", str(source)]),
+                mock.patch.object(estimator, "iter_files", return_value=iter([source])),
+                mock.patch.object(Path, "stat", side_effect=PermissionError("private stat error")),
+                redirect_stdout(output),
+                redirect_stderr(diagnostics),
+            ):
+                status = estimator.main()
+
+            self.assertEqual(status, 2)
+            self.assertEqual(output.getvalue(), "")
+            self.assertIn("error: cannot read selected input:", diagnostics.getvalue())
+            self.assertNotIn("private stat error", diagnostics.getvalue())
 
     def test_strict_utf8_rejects_corrupt_input_without_partial_measurements(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

@@ -115,13 +115,22 @@ def main() -> int:
     rows: list[tuple[str, int, int, int, int, int]] = []
     totals = [0, 0, 0, 0, 0]
 
-    for path in iter_files(args.paths):
+    try:
+        files = list(iter_files(args.paths))
+    except OSError:
+        print("error: cannot traverse selected input", file=sys.stderr)
+        return 2
+
+    for path in files:
         try:
             text = read_text(path, strict_utf8=args.fail_on_invalid_utf8)
+            byte_count = path.stat().st_size
         except UnicodeDecodeError:
             print(f"error: invalid UTF-8 input: {path}", file=sys.stderr)
             return 2
-        byte_count = path.stat().st_size
+        except OSError:
+            print(f"error: cannot read selected input: {path}", file=sys.stderr)
+            return 2
         char_count = len(text)
         word_count = len(text.split())
         line_count = len(text.splitlines())
