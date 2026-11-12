@@ -40,6 +40,8 @@ python3 scripts/estimate-context-size.py before.md after.md --fail-on-missing --
 
 `--fail-on-invalid-utf8` also rejects selected files containing malformed UTF-8 (exit code 2, with no partial table or totals). The diagnostic identifies the file without echoing its bytes. By default, the helper still substitutes replacement characters for invalid input, which is convenient for exploratory scans but can distort character and approximate-token comparisons. Use the strict flag for reproducible text-only benchmarks; it does not make the estimates tokenizer-exact.
 
+Unreadable selected files, post-read file-stat failures, and directory traversal errors also exit with code 2 and no partial measurements or traceback. Diagnostics identify the affected input where available without reproducing exception details or file contents. These failures are **not** treated like optional missing inputs, even when `--fail-on-missing` is omitted.
+
 When measuring a directory, the helper recursively skips generated or dependency
 directories named `.git`, `.venv`, `venv`, `node_modules`, `__pycache__`,
 or `.pytest_cache` at any depth. This keeps the default estimate focused on
