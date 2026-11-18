@@ -121,7 +121,7 @@ class EstimateContextSizeTests(unittest.TestCase):
 
             self.assertEqual(list(estimator.iter_files([str(repo)])), [document])
 
-    def test_read_text_preserves_unicode_and_replaces_invalid_utf8(self) -> None:
+    def test_read_text_with_size_preserves_unicode_and_replaces_invalid_utf8(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             unicode_path = root / "unicode.txt"
@@ -129,8 +129,8 @@ class EstimateContextSizeTests(unittest.TestCase):
             unicode_path.write_text("café ☕", encoding="utf-8")
             invalid_path.write_bytes(b"good\xffbad")
 
-            self.assertEqual(estimator.read_text(unicode_path), "café ☕")
-            self.assertEqual(estimator.read_text(invalid_path), "good\ufffdbad")
+            self.assertEqual(estimator.read_text_with_size(unicode_path), ("café ☕", 9))
+            self.assertEqual(estimator.read_text_with_size(invalid_path), ("good\ufffdbad", 8))
 
     def test_markdown_cli_reports_unicode_totals(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -195,7 +195,7 @@ class EstimateContextSizeTests(unittest.TestCase):
             output, diagnostics = io.StringIO(), io.StringIO()
             with (
                 mock.patch.object(sys, "argv", ["estimate-context-size.py", str(source)]),
-                mock.patch.object(estimator, "read_text", side_effect=PermissionError("secret text")),
+                mock.patch.object(estimator, "read_text_with_size", side_effect=PermissionError("secret text")),
                 redirect_stdout(output),
                 redirect_stderr(diagnostics),
             ):
@@ -222,24 +222,33 @@ class EstimateContextSizeTests(unittest.TestCase):
         self.assertIn("error: cannot traverse selected input", diagnostics.getvalue())
         self.assertNotIn("private listing", diagnostics.getvalue())
 
-    def test_stat_failure_after_read_exits_without_partial_output(self) -> None:
+    def test_byte_and_text_counts_use_same_snapshot_when_file_changes(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             source = Path(directory) / "input.md"
-            source.write_text("context", encoding="utf-8")
+            source.write_text("café\n", encoding="utf-8")
+            original_read = Path.read_bytes
+            reads = 0
+
+            def read_then_change() -> bytes:
+                nonlocal reads
+                reads += 1
+                snapshot = original_read(source)
+                source.write_text("substantially longer replacement\n", encoding="utf-8")
+                return snapshot
+
             output, diagnostics = io.StringIO(), io.StringIO()
             with (
                 mock.patch.object(sys, "argv", ["estimate-context-size.py", str(source)]),
-                mock.patch.object(estimator, "iter_files", return_value=iter([source])),
-                mock.patch.object(Path, "stat", side_effect=PermissionError("private stat error")),
+                mock.patch.object(Path, "read_bytes", side_effect=read_then_change),
                 redirect_stdout(output),
                 redirect_stderr(diagnostics),
             ):
                 status = estimator.main()
 
-            self.assertEqual(status, 2)
-            self.assertEqual(output.getvalue(), "")
-            self.assertIn("error: cannot read selected input:", diagnostics.getvalue())
-            self.assertNotIn("private stat error", diagnostics.getvalue())
+            self.assertEqual(status, 0)
+            self.assertEqual(reads, 1)
+            self.assertEqual(diagnostics.getvalue(), "")
+            self.assertIn("bytes=6 chars=5 words=1 lines=1", output.getvalue())
 
     def test_strict_utf8_rejects_corrupt_input_without_partial_measurements(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
