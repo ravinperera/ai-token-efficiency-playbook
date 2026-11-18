@@ -30,8 +30,10 @@ check_large_file() {
     return 0
   fi
 
-  local size_kb
-  size_kb=$(du -k "$file" | awk '{print $1}')
+  # Measure file contents, not disk allocation (sparse files may use no blocks).
+  local size_bytes size_kb
+  size_bytes=$(wc -c < "$file")
+  size_kb=$(( (size_bytes + 1023) / 1024 ))
 
   case "$file" in
     *.log|*.out|*.trace)

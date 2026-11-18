@@ -101,4 +101,41 @@ expect_failure \
   "large-log-file: fallback output.trace" \
   bash -c "cd '$directory' && MAX_LOG_FILE_KB=4 bash '$CHECK_SCRIPT'"
 
+
+# Disk allocation differs from logical size on sparse and tiny files.
+repo=$(new_repo)
+truncate -s 16384 "$repo/sparse.log"
+git -C "$repo" add sparse.log
+expect_failure \
+  "sparse staged log above limit" \
+  "large-log-file: sparse.log is 16KB; limit is 4KB" \
+  bash -c "cd '$repo' && MAX_LOG_FILE_KB=4 bash '$CHECK_SCRIPT'"
+
+repo=$(new_repo)
+printf 'x' > "$repo/tiny.log"
+git -C "$repo" add tiny.log
+expect_success \
+  "one-byte file below 1KB limit" \
+  bash -c "cd '$repo' && MAX_LOG_FILE_KB=1 bash '$CHECK_SCRIPT'"
+
+repo=$(new_repo)
+printf 'x' > "$repo/-flag.log"
+git -C "$repo" add -- -flag.log
+expect_success \
+  "staged filename beginning with a dash" \
+  bash -c "cd '$repo' && MAX_LOG_FILE_KB=1 bash '$CHECK_SCRIPT'"
+
+repo=$(new_repo)
+truncate -s 4096 "$repo/boundary.log"
+git -C "$repo" add boundary.log
+expect_success \
+  "exact 4KB limit" \
+  bash -c "cd '$repo' && MAX_LOG_FILE_KB=4 bash '$CHECK_SCRIPT'"
+truncate -s 4097 "$repo/boundary.log"
+git -C "$repo" add boundary.log
+expect_failure \
+  "one byte above 4KB limit" \
+  "large-log-file: boundary.log is 5KB; limit is 4KB" \
+  bash -c "cd '$repo' && MAX_LOG_FILE_KB=4 bash '$CHECK_SCRIPT'"
+
 echo "token hygiene regression tests passed."
