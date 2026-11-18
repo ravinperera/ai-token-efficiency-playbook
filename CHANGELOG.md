@@ -17,6 +17,7 @@ This project follows a lightweight, documentation-first changelog. Versions are 
 
 ### Changed
 
+- Context-size estimates now derive byte count and decoded text from the same file read, preventing mismatched per-file measurements if an input changes between operations.
 - Added opt-in strict UTF-8 validation to context estimates for reproducible text benchmarks; default replacement decoding remains unchanged.
 - Markdown quality checks now ignore commented-out link examples while preserving validation of active links and inline-code boundaries.
 - Token counter now fails closed with concise diagnostics on invalid tokenizer encodings or local tokenizer resource errors, without returning approximate counts after tokenizer failure.

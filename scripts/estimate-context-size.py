@@ -55,10 +55,11 @@ def iter_files(paths: Iterable[str]) -> Iterable[Path]:
             print(f"warning: skipped missing path: {path}", file=sys.stderr)
 
 
-def read_text(path: Path, *, strict_utf8: bool = False) -> str:
-    return path.read_text(
-        encoding="utf-8", errors="strict" if strict_utf8 else "replace"
-    )
+def read_text_with_size(path: Path, *, strict_utf8: bool = False) -> tuple[str, int]:
+    """Measure original bytes and decoded text from the same file snapshot."""
+    raw = path.read_bytes()
+    text = raw.decode("utf-8", errors="strict" if strict_utf8 else "replace")
+    return text, len(raw)
 
 
 def estimate_tokens(text: str) -> int:
@@ -123,8 +124,9 @@ def main() -> int:
 
     for path in files:
         try:
-            text = read_text(path, strict_utf8=args.fail_on_invalid_utf8)
-            byte_count = path.stat().st_size
+            text, byte_count = read_text_with_size(
+                path, strict_utf8=args.fail_on_invalid_utf8
+            )
         except UnicodeDecodeError:
             print(f"error: invalid UTF-8 input: {path}", file=sys.stderr)
             return 2
