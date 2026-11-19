@@ -31,6 +31,13 @@ check_large_file() {
   fi
 
   # Measure file contents, not disk allocation (sparse files may use no blocks).
+  # Media assets are not text context or raw execution logs. Keep media policy separate.
+  case "$file" in
+    *.png|*.jpg|*.jpeg|*.gif|*.webp|*.ico|*.pdf)
+      return 0
+      ;;
+  esac
+
   local size_bytes size_kb
   size_bytes=$(wc -c < "$file")
   size_kb=$(( (size_bytes + 1023) / 1024 ))
@@ -58,9 +65,17 @@ check_instruction_file ".github/copilot-instructions.md"
 check_instruction_file ".cursor/rules/token-efficiency.mdc"
 
 if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-  while IFS= read -r -d '' file; do
-    check_large_file "$file"
-  done < <(git diff --cached --name-only --diff-filter=ACM -z)
+  if git diff --cached --quiet --; then
+    # Clean CI checkouts have no staged diff; scan tracked content instead of nothing.
+    while IFS= read -r -d '' file; do
+      check_large_file "$file"
+    done < <(git ls-files -z)
+  else
+    # Keep the quick staged-file check for local pre-commit use.
+    while IFS= read -r -d '' file; do
+      check_large_file "$file"
+    done < <(git diff --cached --name-only --diff-filter=ACM -z)
+  fi
 else
   while IFS= read -r -d '' file; do
     file="${file#./}"

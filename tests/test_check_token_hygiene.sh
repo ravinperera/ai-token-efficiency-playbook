@@ -93,6 +93,32 @@ expect_success \
   "untracked files are outside staged check" \
   bash -c "cd '$repo' && MAX_LOG_FILE_KB=4 bash '$CHECK_SCRIPT'"
 
+repo=$(new_repo)
+truncate -s 16384 "$repo/committed.log"
+git -C "$repo" add committed.log
+git -C "$repo" -c user.name=Fixture -c user.email=fixture@example.invalid commit -qm "Add log fixture"
+expect_failure \
+  "large committed log in clean checkout" \
+  "large-log-file: committed.log" \
+  bash -c "cd '$repo' && MAX_LOG_FILE_KB=4 bash '$CHECK_SCRIPT'"
+
+repo=$(new_repo)
+truncate -s 16384 "$repo/committed.txt"
+git -C "$repo" add committed.txt
+git -C "$repo" -c user.name=Fixture -c user.email=fixture@example.invalid commit -qm "Add text fixture"
+expect_failure \
+  "large committed context in clean checkout" \
+  "large-context-file: committed.txt" \
+  bash -c "cd '$repo' && MAX_CONTEXT_FILE_KB=4 bash '$CHECK_SCRIPT'"
+
+repo=$(new_repo)
+truncate -s 16384 "$repo/illustration.png"
+git -C "$repo" add illustration.png
+git -C "$repo" -c user.name=Fixture -c user.email=fixture@example.invalid commit -qm "Add media fixture"
+expect_success \
+  "non-text media excluded from text thresholds" \
+  bash -c "cd '$repo' && MAX_CONTEXT_FILE_KB=4 bash '$CHECK_SCRIPT'"
+
 directory=$(mktemp -d)
 TEMP_DIRS+=("$directory")
 dd if=/dev/zero of="$directory/fallback output.trace" bs=1024 count=16 status=none

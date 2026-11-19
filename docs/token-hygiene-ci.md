@@ -12,6 +12,12 @@ The script checks for:
 - large context files that may be expensive to paste or load into agents
 - large log, output, or trace files that should usually be summarised instead of committed
 
+## Which files are checked
+
+In local pre-commit use, when there are staged changes, the script checks staged added, copied, and modified files. In a clean Git checkout (including the GitHub Actions workflow), there is no staged diff, so it checks all tracked files instead of silently skipping the size checks. Untracked files are not scanned.
+
+The text/log size limits exclude non-text media assets (PNG, JPEG, GIF, WebP, ICO, and PDF). These assets may need a separate review for storage or visual-context costs; the text thresholds are not a media-size policy. Agent instruction files are always checked when present.
+
 ## Default thresholds
 
 | Setting | Default | Purpose |
