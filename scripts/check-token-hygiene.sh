@@ -7,15 +7,40 @@ MAX_LOG_FILE_KB="${MAX_LOG_FILE_KB:-64}"
 
 failures=0
 
+# Pre-commit checks must inspect the staged snapshot, not later worktree edits.
+source_mode=worktree
+if git rev-parse --is-inside-work-tree >/dev/null 2>&1 &&
+   ! git diff --cached --quiet --; then
+  source_mode=staged
+fi
+
+is_regular_file() {
+  local file="$1"
+  if [ "$source_mode" = staged ]; then
+    local entry
+    entry=$(git ls-files --stage -- "$file")
+    case "$entry" in
+      100644\ *|100755\ *) return 0 ;;
+      *) return 1 ;;  # Ignore symlinks and gitlinks in the index.
+    esac
+  else
+    [ -f "$file" ]
+  fi
+}
+
 check_instruction_file() {
   local file="$1"
 
-  if [ ! -f "$file" ]; then
+  if ! is_regular_file "$file"; then
     return 0
   fi
 
   local lines
-  lines=$(awk 'END { print NR }' "$file")
+  if [ "$source_mode" = staged ]; then
+    lines=$(git show ":$file" | awk 'END { print NR }')
+  else
+    lines=$(awk 'END { print NR }' "$file")
+  fi
 
   if [ "$lines" -gt "$MAX_INSTRUCTION_LINES" ]; then
     echo "instruction-too-large: $file has $lines lines; limit is $MAX_INSTRUCTION_LINES"
@@ -26,7 +51,7 @@ check_instruction_file() {
 check_large_file() {
   local file="$1"
 
-  if [ ! -f "$file" ]; then
+  if ! is_regular_file "$file"; then
     return 0
   fi
 
@@ -39,7 +64,11 @@ check_large_file() {
   esac
 
   local size_bytes size_kb
-  size_bytes=$(wc -c < "$file")
+  if [ "$source_mode" = staged ]; then
+    size_bytes=$(git cat-file -s ":$file")
+  else
+    size_bytes=$(wc -c < "$file")
+  fi
   size_kb=$(( (size_bytes + 1023) / 1024 ))
 
   case "$file" in
@@ -65,13 +94,13 @@ check_instruction_file ".github/copilot-instructions.md"
 check_instruction_file ".cursor/rules/token-efficiency.mdc"
 
 if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-  if git diff --cached --quiet --; then
+  if [ "$source_mode" = worktree ]; then
     # Clean CI checkouts have no staged diff; scan tracked content instead of nothing.
     while IFS= read -r -d '' file; do
       check_large_file "$file"
     done < <(git ls-files -z)
   else
-    # Keep the quick staged-file check for local pre-commit use.
+    # Pre-commit checks must use index blobs, not unstaged worktree changes.
     while IFS= read -r -d '' file; do
       check_large_file "$file"
     done < <(git diff --cached --name-only --diff-filter=ACM -z)
