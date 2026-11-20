@@ -86,12 +86,28 @@ case "$tool" in
     ;;
 esac
 
+# Never let an existing or dangling link redirect a copy outside this checkout.
+# --force permits replacing regular files, not following symbolic links.
+if [ -L "$destination" ]; then
+  echo "Refusing to install through symlinked destination: $destination" >&2
+  exit 3
+fi
+
 if [ -e "$destination" ] && [ "$force" -ne 1 ]; then
   echo "Refusing to overwrite existing $destination. Re-run with --force to replace it." >&2
   exit 3
 fi
 
 parent=$(dirname "$destination")
+# Also reject symlinks in intermediate directories (e.g. .cursor or .github).
+check_path=$parent
+while [ "$check_path" != "." ]; do
+  if [ -L "$check_path" ]; then
+    echo "Refusing to install through symlinked directory: $check_path" >&2
+    exit 3
+  fi
+  check_path=$(dirname "$check_path")
+done
 if [ "$parent" != "." ]; then
   mkdir -p "$parent"
 fi
