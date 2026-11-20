@@ -48,7 +48,7 @@ fi
 
 # Neither ordinary installs nor --force may follow destination symlinks.
 mkdir -p "$TMP/symlink-existing"
-printf 'outside unchanged\\n' > "$TMP/external-existing.md"
+echo 'outside unchanged' > "$TMP/external-existing.md"
 ln -s "$TMP/external-existing.md" "$TMP/symlink-existing/AGENTS.md"
 if run_install "$TMP/symlink-existing" --force codex >/dev/null 2>&1; then
   echo "installer followed an existing destination symlink with --force" >&2
