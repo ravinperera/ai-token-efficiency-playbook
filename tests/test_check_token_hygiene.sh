@@ -164,4 +164,49 @@ expect_failure \
   "large-log-file: boundary.log is 5KB; limit is 4KB" \
   bash -c "cd '$repo' && MAX_LOG_FILE_KB=4 bash '$CHECK_SCRIPT'"
 
+
+# Staged checks must read the Git index rather than subsequent worktree edits.
+repo=$(new_repo)
+truncate -s 16384 "$repo/staged-large.log"
+git -C "$repo" add staged-large.log
+printf 'small\\n' > "$repo/staged-large.log"
+expect_failure \\
+  "large staged log despite smaller worktree" \\
+  "large-log-file: staged-large.log" \\
+  bash -c "cd '$repo' && MAX_LOG_FILE_KB=4 bash '$CHECK_SCRIPT'"
+
+repo=$(new_repo)
+printf 'small\\n' > "$repo/staged-small.log"
+git -C "$repo" add staged-small.log
+truncate -s 16384 "$repo/staged-small.log"
+expect_success \\
+  "small staged log despite larger unstaged worktree" \\
+  bash -c "cd '$repo' && MAX_LOG_FILE_KB=4 bash '$CHECK_SCRIPT'"
+
+repo=$(new_repo)
+truncate -s 16384 "$repo/removed-worktree.log"
+git -C "$repo" add removed-worktree.log
+rm "$repo/removed-worktree.log"
+expect_failure \\
+  "large staged log missing from worktree" \\
+  "large-log-file: removed-worktree.log" \\
+  bash -c "cd '$repo' && MAX_LOG_FILE_KB=4 bash '$CHECK_SCRIPT'"
+
+repo=$(new_repo)
+printf 'one\\ntwo\\nthree\\n' > "$repo/AGENTS.md"
+git -C "$repo" add AGENTS.md
+printf 'one\\n' > "$repo/AGENTS.md"
+expect_failure \\
+  "long staged instructions despite shorter worktree" \\
+  "instruction-too-large: AGENTS.md has 3 lines" \\
+  bash -c "cd '$repo' && MAX_INSTRUCTION_LINES=2 bash '$CHECK_SCRIPT'"
+
+repo=$(new_repo)
+printf 'one\\n' > "$repo/AGENTS.md"
+git -C "$repo" add AGENTS.md
+printf 'one\\ntwo\\nthree\\n' > "$repo/AGENTS.md"
+expect_success \\
+  "short staged instructions despite longer worktree" \\
+  bash -c "cd '$repo' && MAX_INSTRUCTION_LINES=2 bash '$CHECK_SCRIPT'"
+
 echo "token hygiene regression tests passed."
