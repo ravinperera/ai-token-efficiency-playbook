@@ -209,4 +209,32 @@ expect_success \
   "short staged instructions despite longer worktree" \
   bash -c "cd '$repo' && MAX_INSTRUCTION_LINES=2 bash '$CHECK_SCRIPT'"
 
+# Renames into a checked extension and type changes can introduce large logs.
+repo=$(mktemp -d)
+TEMP_DIRS+=("$repo")
+git -C "$repo" init -q
+git -C "$repo" config diff.renames true
+truncate -s 16384 "$repo/artifact.png"
+git -C "$repo" add artifact.png
+git -C "$repo" -c user.name=Fixture -c user.email=fixture@example.invalid commit -qm "Add media fixture"
+git -C "$repo" mv artifact.png artifact.log
+expect_failure \
+  "renamed media becomes a staged log" \
+  "large-log-file: artifact.log" \
+  bash -c "cd '$repo' && MAX_LOG_FILE_KB=4 bash '$CHECK_SCRIPT'"
+
+repo=$(mktemp -d)
+TEMP_DIRS+=("$repo")
+git -C "$repo" init -q
+ln -s missing-target "$repo/converted.log"
+git -C "$repo" add converted.log
+git -C "$repo" -c user.name=Fixture -c user.email=fixture@example.invalid commit -qm "Add symlink fixture"
+rm "$repo/converted.log"
+truncate -s 16384 "$repo/converted.log"
+git -C "$repo" add converted.log
+expect_failure \
+  "staged symlink replaced by a regular log" \
+  "large-log-file: converted.log" \
+  bash -c "cd '$repo' && MAX_LOG_FILE_KB=4 bash '$CHECK_SCRIPT'"
+
 echo "token hygiene regression tests passed."

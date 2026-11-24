@@ -101,9 +101,10 @@ if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
     done < <(git ls-files -z)
   else
     # Pre-commit checks must use index blobs, not unstaged worktree changes.
+    # Treat renames as delete/add and include type changes; only regular index files count.
     while IFS= read -r -d '' file; do
       check_large_file "$file"
-    done < <(git diff --cached --name-only --diff-filter=ACM -z)
+    done < <(git diff --cached --no-renames --name-only --diff-filter=ACMT -z)
   fi
 else
   while IFS= read -r -d '' file; do
