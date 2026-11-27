@@ -48,6 +48,25 @@ Before each attempted submission, check route approval, capability and remaining
 
 Distinguish a prevented boundary violation from an actual unauthorized request. Both remain visible in the report; an actual boundary breach fails the safety gate regardless of output quality or cost. Budget exhaustion, unsafe fallback, no capable approved route, and deadline exhaustion are explicit terminal outcomes.
 
+## Shared-Budget Contention Stratum
+
+A per-run ceiling does not measure contention between concurrent runs that share a project or tenant ceiling. For routers with shared hard limits, run a separate, synthetic admission and settlement comparison. Use the [companion governance checklist's shared-budget controls](https://github.com/ravinperera/ai-security-governance-checklist/blob/487295dd86c802115563105ccde1ab2714b408c3/checklists/model-routing-fallback-governance.md#shared-hard-ceilings-and-outstanding-usage) as the policy baseline. The following is a measurement protocol, not an implementation or a measured result.
+
+Freeze the parent budget, child allocations, reservation rule, admission/queue order, queue deadline, clock, pricing units and event schedule before comparing configurations. Use a fake provider with deterministic usage receipts, a barrier to submit competing requests before either settles, and reset the ledger between trials. No live provider spending is needed. Compare approved configurations using identical schedules and limits; an intentionally unsafe baseline may be simulated in isolation only.
+
+| Event schedule (synthetic budget units) | Expected invariant |
+| --- | --- |
+| Parent ceiling 10; two distinct child runs request 6 each concurrently | At most one request is dispatched before settlement, regardless of which child wins |
+| First request reserves 6; timeout leaves delivery and charge uncertain; another requests 6 | Outstanding exposure is retained; the second dispatch is denied or queued while 6 remains reserved |
+| First request settles at 4; repeat the same settlement receipt; queued request still needs 6 | Exactly 6 is available after either receipt; at most one additional 6-unit dispatch is admitted |
+| A worker restarts with an unresolved 6-unit reservation | Recovered state still accounts for the outstanding reservation before any new admission |
+
+Record each event in the attempt/overhead ledger below, adding parent budget and window IDs, child run ID, reservation ID, settlement receipt ID, committed and outstanding exposure before/after, admission decision, queue duration and actual fake-provider dispatch evidence. A queued or rejected candidate is not a submitted model attempt. A duplicate receipt is not another charge.
+
+Report each schedule and configuration separately: scheduled tasks, admitted dispatches, denied/queued tasks, queue expirations, eventual verified outcomes, maximum committed-plus-outstanding exposure, unresolved exposure at cutoff, and duplicate-settlement or ceiling violations. Report queue time in end-to-end latency and include all scheduled tasks in the governed-success denominator. Count parent-level usage once; do not add the child-level view again. A correctly denied request can satisfy an admission invariant without completing the task. Any admission that violates a declared hard ceiling fails the budget gate even if final billed usage happens to fit.
+
+Keep synthetic contention results separate from normal model-run results and from tabletop reviews. If no suitable simulator or observable ledger exists, mark the stratum unavailable; a documented expectation is not evidence of atomic enforcement.
+
 ## Capture Every Attempt And The Whole Run
 
 Use the [routing benchmark record](../templates/model-routing-benchmark-record.md), linked to the existing manifest. Retain a unique request/attempt identifier and its parent run. Include unsuccessful and cancelled requests, partial outputs, routing/classification calls, cache preparation, verifier calls, tool usage, retries, backoff and human correction effort.
