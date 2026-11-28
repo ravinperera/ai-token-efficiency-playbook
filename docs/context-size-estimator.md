@@ -42,6 +42,8 @@ python3 scripts/estimate-context-size.py before.md after.md --fail-on-missing --
 
 Unreadable selected files and directory traversal errors also exit with code 2 and no partial measurements or traceback. Diagnostics identify the affected input where available without reproducing exception details or file contents. These failures are **not** treated like optional missing inputs, even when `--fail-on-missing` is omitted.
 
+Displayed paths in reports and diagnostics escape control characters, Unicode line separators and filesystem surrogate characters using visible backslash escapes (for example, `\n` or `\x1b`). This keeps one file on one report line without changing the input path or its measurements. Displayed paths are labels, not shell-escaped commands.
+
 For each file, the helper derives byte size and decoded text from a **single byte read**. This avoids mixing the size of one version with the character/token estimate of another if an input changes while being measured. It does not freeze an entire directory or guarantee a multi-file snapshot: pin or copy your inputs for a reproducible benchmark.
 
 When measuring a directory, the helper recursively skips generated or dependency

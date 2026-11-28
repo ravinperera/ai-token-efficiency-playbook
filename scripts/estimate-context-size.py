@@ -12,6 +12,7 @@ import argparse
 import re
 from pathlib import Path
 import sys
+import unicodedata
 from typing import Iterable
 
 
@@ -52,7 +53,7 @@ def iter_files(paths: Iterable[str]) -> Iterable[Path]:
             seen.add(canonical)
             yield path
         else:
-            print(f"warning: skipped missing path: {path}", file=sys.stderr)
+            print(f"warning: skipped missing path: {display_path(path)}", file=sys.stderr)
 
 
 def read_text_with_size(path: Path, *, strict_utf8: bool = False) -> tuple[str, int]:
@@ -68,8 +69,19 @@ def estimate_tokens(text: str) -> int:
     return max(1, round(len(text) / 4)) if text else 0
 
 
+def display_path(path: str | Path) -> str:
+    """Keep filesystem control characters and surrogate names out of reports."""
+    return "".join(
+        ascii(char)[1:-1]
+        if unicodedata.category(char) in {"Cc", "Cs", "Zl", "Zp"}
+        else char
+        for char in str(path)
+    )
+
+
 def markdown_code_path(path: str) -> str:
     """Render a path as one Markdown table cell, including special filenames."""
+    path = display_path(path)
     longest_run = max((len(run) for run in re.findall(r"`+", path)), default=0)
     fence = "`" * (longest_run + 1)
     escaped = path.replace("|", r"\|")
@@ -110,7 +122,7 @@ def main() -> int:
         missing_paths = [Path(raw_path) for raw_path in args.paths if not Path(raw_path).exists()]
         if missing_paths:
             for path in missing_paths:
-                print(f"error: missing path: {path}", file=sys.stderr)
+                print(f"error: missing path: {display_path(path)}", file=sys.stderr)
             return 2
 
     rows: list[tuple[str, int, int, int, int, int]] = []
@@ -128,10 +140,10 @@ def main() -> int:
                 path, strict_utf8=args.fail_on_invalid_utf8
             )
         except UnicodeDecodeError:
-            print(f"error: invalid UTF-8 input: {path}", file=sys.stderr)
+            print(f"error: invalid UTF-8 input: {display_path(path)}", file=sys.stderr)
             return 2
         except OSError:
-            print(f"error: cannot read selected input: {path}", file=sys.stderr)
+            print(f"error: cannot read selected input: {display_path(path)}", file=sys.stderr)
             return 2
         char_count = len(text)
         word_count = len(text.split())
@@ -157,7 +169,7 @@ def main() -> int:
     else:
         for row in rows:
             print(
-                f"{row[0]}: bytes={row[1]} chars={row[2]} words={row[3]} "
+                f"{display_path(row[0])}: bytes={row[1]} chars={row[2]} words={row[3]} "
                 f"lines={row[4]} est_tokens={row[5]}"
             )
         print(
