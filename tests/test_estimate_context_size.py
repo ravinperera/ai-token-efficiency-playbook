@@ -188,6 +188,50 @@ class EstimateContextSizeTests(unittest.TestCase):
                 self.assertEqual(row.count("|") - row.count(r"\|"), 7)
             self.assertIn("| **Total** | 12 | 12 | 3 | 3 | 3 |", result.stdout)
 
+    def test_display_path_escapes_controls_and_preserves_printable_unicode(self) -> None:
+        self.assertEqual(
+            estimator.display_path("café\n\r\t\x1b\x7f\x85\u2028\u2029\udcff.md"),
+            r"café\n\r\t\x1b\x7f\x85\u2028\u2029\udcff.md",
+        )
+
+    def test_cli_escapes_control_characters_in_report_paths(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "part\nnext\rrow\x1b.md"
+            try:
+                path.write_text("one\n", encoding="utf-8")
+            except OSError as exc:
+                self.skipTest(f"Control-character filenames unavailable: {exc}")
+            shown = str(Path(directory)) + r"/part\nnext\rrow\x1b.md"
+            for flags in ([], ["--markdown"]):
+                with self.subTest(flags=flags):
+                    result = subprocess.run(
+                        [sys.executable, str(SCRIPT_PATH), str(path), *flags],
+                        check=True, capture_output=True, text=True,
+                    )
+                    self.assertIn(shown, result.stdout)
+                    self.assertNotIn("\x1b", result.stdout)
+                    self.assertNotIn("part\nnext", result.stdout)
+                    if flags:
+                        self.assertEqual(len(result.stdout.splitlines()), 5)
+                        self.assertIn("| **Total** | 4 | 4 | 1 | 1 | 1 |", result.stdout)
+                    else:
+                        self.assertIn("total: bytes=4 chars=4 words=1 lines=1 est_tokens=1",
+                                      result.stdout)
+
+    def test_missing_path_diagnostics_escape_controls(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            missing = Path(directory) / "missing\nname\x1b.md"
+            for flags, status in (([], 0), (["--fail-on-missing"], 2)):
+                with self.subTest(flags=flags):
+                    result = subprocess.run(
+                        [sys.executable, str(SCRIPT_PATH), str(missing), *flags],
+                        capture_output=True, text=True, check=False,
+                    )
+                    self.assertEqual(result.returncode, status)
+                    self.assertIn(r"missing\nname\x1b.md", result.stderr)
+                    self.assertEqual(len(result.stderr.splitlines()), 1)
+                    self.assertNotIn("\x1b", result.stderr)
+
     def test_unreadable_selected_file_exits_cleanly_without_partial_output(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             source = Path(directory) / "input.md"
